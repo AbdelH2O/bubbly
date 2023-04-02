@@ -91,8 +91,7 @@ const BubblePage = () => {
             ) {
                 bubble.info_entity = [];
             }
-            // @ts-ignore
-            setBubble(bubble);
+            setBubble(bubble as Bubble);
             console.log(bubble);
         }
     };
@@ -563,9 +562,11 @@ const BubblePage = () => {
                                                         >
                                                             {
                                                                 info?.processed === 0 ? (
+                                                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                                                     <Image src={x} width={20} height={20} alt="x mark" />
                                                                 ) : (
                                                                     info?.processed === 2 ? (
+                                                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                                                         <Image src={check} width={20} height={20} alt="check mark" />
                                                                     ) : (
                                                                         <Lottie animationData={loadingAnimation} className="w-6" />
