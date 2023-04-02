@@ -12,6 +12,7 @@ import loadingAnimation from "~/assets/sloading.json";
 import { Transition, Dialog } from "@headlessui/react";
 import x from "~/assets/x.svg";
 import check from "~/assets/check.svg";
+import nProgress from "nprogress";
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -66,6 +67,8 @@ const BubblePage = () => {
     const [modal, setModal] = useState<boolean>(false);
 
     const getBubble = async () => {
+        nProgress.set(0.3);
+        nProgress.start();
         const { data, error } = await supabase
             .from("bubble")
             .select(
@@ -94,6 +97,7 @@ const BubblePage = () => {
             setBubble(bubble as Bubble);
             console.log(bubble);
         }
+        nProgress.done();
     };
 
     useEffect(() => {
@@ -113,6 +117,8 @@ const BubblePage = () => {
     const addInfo = () => {
         void (
             async () => {
+                nProgress.set(0.3);
+                nProgress.start();
                 const { data, error } = await supabase
                     .from("info_entity")
                     .insert({
@@ -120,15 +126,26 @@ const BubblePage = () => {
                         data: info.data,
                         bubble: bubble.id,
                     })
-                    .single();
+                    .select();
                     
                 if (error) {
                     toast.error(error.message);
                 }
-                if (data) {
+                if (data && data.length > 0) {
                     toast.success("Info added successfully");
+                    setInfo({
+                        type: "text",
+                        data: "",
+                        processed: 0,
+                    });
+                    const entities = bubble.info_entity ? bubble.info_entity : [];
+                    setBubble({
+                        ...bubble,
+                        info_entity: [...entities, data[0]!],
+                    });
                     closeModal();
                 }
+                nProgress.done();
             }
         )();
     };
