@@ -13,6 +13,7 @@ import { Transition, Dialog } from "@headlessui/react";
 import x from "~/assets/x.svg";
 import check from "~/assets/check.svg";
 import nProgress from "nprogress";
+import { api } from "~/utils/api";
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -59,6 +60,15 @@ const BubblePage = () => {
         created_at: "",
         info_entity: null,
     });
+    const [process, setProcess] = useState<{
+        id: string;
+        type: string;
+    }>({
+        id: "",
+        type: "",
+    });
+    const processing = api.entity.process.useMutation();
+    const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
     const [info, setInfo] = useState<InfoEntity>({
         type: "text",
         data: "",
@@ -80,6 +90,7 @@ const BubblePage = () => {
             `
             )
             .eq("id", id)
+            .order("created_at", { ascending: false })
             .single();
         console.log(data);
         if (error) {
@@ -100,11 +111,33 @@ const BubblePage = () => {
         nProgress.done();
     };
 
+
     useEffect(() => {
         if (id) {
             void getBubble();
         }
     }, [id]);
+
+    useEffect(() => {
+        if (process.id) {
+            void (async () => {
+                const resp = await processing.mutateAsync({
+                    entity: process.id,
+                    type: process.type,
+                });
+                if (resp) {
+                    toast.success("Processing started");
+                } else {
+                    toast.error("Error processing");
+                }
+                setProcess({
+                    id: "",
+                    type: "",
+                });
+            })();
+
+        }
+    }, [process]);
 
     const openModal = () => {
         setModal(true);
@@ -119,11 +152,16 @@ const BubblePage = () => {
             async () => {
                 nProgress.set(0.3);
                 nProgress.start();
+                const tt = info.type === "text" ? {
+                    data: info.data,
+                } : {
+                    url: info.data,
+                }
                 const { data, error } = await supabase
                     .from("info_entity")
                     .insert({
+                        ...tt,
                         type: info.type,
-                        data: info.data,
                         bubble: bubble.id,
                     })
                     .select();
@@ -527,16 +565,52 @@ const BubblePage = () => {
                                                         {info?.type.charAt(0).toUpperCase() + info?.type.slice(1)}
                                                     </h3>
                                                     {/* Process button */}
-                                                    <button
-                                                        className={
-                                                            "my-auto disabled:brightness-90 disabled:cursor-not-allowed rounded bg-white py-2 px-4 font-bold text-red-800 hover:bg-red-50 " +
-                                                            poppins.className
-                                                        }
-                                                        disabled={true}
-                                                        // onClick={startProcessing}
-                                                    >
-                                                        Process
-                                                    </button>
+                                                    {
+                                                        info.processed === 0 && (
+                                                        <button
+                                                            className={
+                                                                "my-auto disabled:brightness-90 disabled:cursor-not-allowed rounded bg-white py-2 px-4 font-bold text-red-800 hover:bg-red-50 " +
+                                                                poppins.className
+                                                            }
+                                                            // disabled={info.processed !== 0 || loading[info.id]}
+                                                            // onClick={startProcessing}
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                setProcess({
+                                                                    id: info.id,
+                                                                    type: info.type,
+                                                                });
+                                                                setLoading({
+                                                                    ...loading,
+                                                                    [info.id]: true,
+                                                                });
+                                                                setBubble({
+                                                                    ...bubble,
+                                                                    info_entity: bubble?.info_entity ? bubble?.info_entity?.map((i) => {
+                                                                        if (i.id === info.id) {
+                                                                            i.processed = 1;
+                                                                        }
+                                                                        return i;
+                                                                    }) : null,
+                                                                })
+                                                            }}
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="mr-1 inline-block h-5 w-5"
+                                                                viewBox="0 0 20 20"
+                                                                fill="currentColor"
+                                                            >
+                                                                <path
+                                                                    fillRule="evenodd"
+                                                                    d="M10 3a1 1 0 00-1 1v4H5a1 1 0 100 2h4v4a1 1 0 102 0v-4h4a1 1 0 100-2h-4V4a1 1 0 00-1-1z"
+                                                                    clipRule="evenodd"
+                                                                />
+                                                            </svg>
+                                                            Process
+                                                        </button>
+                                                        )
+                                                    }
                                                 </div>
                                             </div>
                                             <div className="border-t border-gray-200">

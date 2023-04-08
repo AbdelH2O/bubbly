@@ -32,6 +32,26 @@ export interface Database {
           owner?: string | null
         }
       }
+      embeddings: {
+        Row: {
+          content: string
+          embedding: unknown
+          entity: string
+          id: number
+        }
+        Insert: {
+          content: string
+          embedding: unknown
+          entity: string
+          id?: number
+        }
+        Update: {
+          content?: string
+          embedding?: unknown
+          entity?: string
+          id?: number
+        }
+      }
       info_entity: {
         Row: {
           bubble: string
@@ -39,7 +59,9 @@ export interface Database {
           data: string
           id: string
           processed: number
+          tokens: number | null
           type: string
+          url: string | null
         }
         Insert: {
           bubble: string
@@ -47,7 +69,9 @@ export interface Database {
           data: string
           id?: string
           processed?: number
+          tokens?: number | null
           type: string
+          url?: string | null
         }
         Update: {
           bubble?: string
@@ -55,7 +79,9 @@ export interface Database {
           data?: string
           id?: string
           processed?: number
+          tokens?: number | null
           type?: string
+          url?: string | null
         }
       }
       users: {
@@ -83,7 +109,60 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      ivfflathandler: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      match_documents: {
+        Args: {
+          query_embedding: unknown
+          similarity_threshold: number
+          match_count: number
+        }
+        Returns: {
+          id: number
+          content: string
+          similarity: number
+        }[]
+      }
+      vector_avg: {
+        Args: {
+          "": number[]
+        }
+        Returns: unknown
+      }
+      vector_dims: {
+        Args: {
+          "": unknown
+        }
+        Returns: number
+      }
+      vector_norm: {
+        Args: {
+          "": unknown
+        }
+        Returns: number
+      }
+      vector_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: {
+          "": unknown
+        }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: {
+          "": unknown[]
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

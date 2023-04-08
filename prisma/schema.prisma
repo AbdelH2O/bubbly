@@ -67,22 +67,26 @@ model verification_tokens {
 model bubble {
   name                                   String        @db.VarChar
   description                            String        @db.VarChar
-  created_at                             DateTime?     @default(now()) @db.Timestamptz(6)
+  created_at                             DateTime      @default(now()) @db.Timestamptz(6)
   id                                     String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  owner                                  String        @db.Uuid
-  users                                  public_users  @relation(fields: [owner], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  owner                                  String?       @default(dbgenerated("auth.uid()")) @db.Uuid
+  users                                  public_users? @relation(fields: [owner], references: [id], onDelete: Cascade, onUpdate: NoAction)
   info_entity_info_entity_bubbleTobubble info_entity[] @relation("info_entity_bubbleTobubble")
 
   @@schema("public")
 }
 
 model info_entity {
-  id                                String   @id @db.Uuid
-  type                              String   @db.VarChar
-  data                              String   @db.VarChar
-  created_at                        DateTime @default(now()) @db.Timestamptz(6)
-  bubble                            String   @db.Uuid
-  bubble_info_entity_bubbleTobubble bubble   @relation("info_entity_bubbleTobubble", fields: [bubble], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                                String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  type                              String       @db.VarChar
+  data                              String       @db.VarChar
+  created_at                        DateTime     @default(now()) @db.Timestamptz(6)
+  bubble                            String       @db.Uuid
+  processed                         Int          @default(0) @db.SmallInt
+  tokens                            BigInt?
+  url                               String?
+  embeddings                        embeddings[]
+  bubble_info_entity_bubbleTobubble bubble       @relation("info_entity_bubbleTobubble", fields: [bubble], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -96,5 +100,15 @@ model public_users {
   users  next_auth_users @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("users")
+  @@schema("public")
+}
+
+model embeddings {
+  id          BigInt                @id @default(autoincrement())
+  content     String                @db.VarChar
+  embedding   Unsupported("vector")
+  entity      String                @db.Uuid
+  info_entity info_entity           @relation(fields: [entity], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
   @@schema("public")
 }
