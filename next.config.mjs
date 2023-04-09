@@ -28,6 +28,7 @@ const config = {
   },
   eslint: {
     dirs: ["src"],
-  }
+  },
+  tsconfigPath: "tsconfig.json",
 };
 export default config;
