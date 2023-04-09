@@ -26,5 +26,8 @@ const config = {
       },
     ],
   },
+  eslint: {
+    dirs: ["src"],
+  }
 };
 export default config;
