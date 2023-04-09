@@ -77,11 +77,13 @@ export const resourceRouter = createTRPCRouter({
                     data: input.data,
                 },
             });
+            console.log("entity", entity);
+            
             const response = await processQueue.add({
                 id: entity.id,
                 type: "count",
             });
-            if(await response.isFailed() || entity === null) {
+            if(entity === null) {
                 return {
                     message: "failed",
                     data: entity,
