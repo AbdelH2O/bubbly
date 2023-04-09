@@ -1,5 +1,7 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({
+    path: '../.env',
+});
 
 import Bull from 'bull';
 
@@ -7,7 +9,7 @@ import { prisma } from './db.js';  // TODO: share this with the server?
 import scrapePage, { countTokens, createEmbeddings } from './services/process.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-const processQueue = new Bull('process', {
+const processQueue = new Bull('prc', {
     settings: {
         stalledInterval: 3000, // How often check for stalled jobs (use 0 for never checking).
         guardInterval: 2000, // Poll interval for delayed jobs and added jobs.
@@ -18,9 +20,14 @@ const processQueue = new Bull('process', {
 console.log(process.env.EDIS_URL);
 
 console.log('Worker started');
-
+void processQueue.count().then((count) => {
+    console.log('Queue count', count);
+});
+void processQueue.getJobLogs('10').then((logs) => {
+    console.log('Job logs', logs);
+});
 void processQueue.process(async (job, done) => {
-    // console.log(job);
+    console.log(job);
     
     const j = job.data as { id: string, type: string };
     const entity = await prisma.info_entity.findUnique({
@@ -66,6 +73,8 @@ void processQueue.process(async (job, done) => {
                 processed: 2,
             },
         });
+        console.log('Processed entity', entity);
+        
         // return Promise.resolve();
         return done();
     }

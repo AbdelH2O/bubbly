@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openAI";
+import { Configuration, OpenAIApi } from "openai";
 // import { env } from "./env.js";
 // console.log(env);
 
