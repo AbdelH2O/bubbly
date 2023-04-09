@@ -5,7 +5,8 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "genTypes": "npx supabase gen types typescript --project-id fuutcwpbkihfauntyjvk > lib/database.types.ts",
+    "devc": "concurrently 'next dev' 'ts-node --esm src/worker/index.ts'",
+    "genTypes": "npx supabase gen types typescript --project-id fuutcwpbkihfauntyjvk | tee lib/database.types.ts src/worker/lib/database.types.ts",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"
@@ -29,6 +30,7 @@
     "next-auth": "^4.20.1",
     "nodemailer": "^6.9.1",
     "nprogress": "^0.2.0",
+    "openai": "^3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-toastify": "^9.1.2",

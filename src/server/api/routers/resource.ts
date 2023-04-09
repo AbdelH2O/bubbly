@@ -7,6 +7,32 @@ import {
 } from "~/server/api/trpc";
 
 import processQueue from "~/utils/redisClient";
+import aiClient from "~/utils/openAIclient";
+import uSBClient from "~/utils/utilitySupabase";
+import { ChatCompletionRequestMessageRoleEnum } from "openai/dist/api";
+
+const CONDENSE_PROMPT = (history: string[], question: string) => {
+    return `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
+
+    Chat History:
+    ${history.join("\n")}
+    Follow Up Input: ${question}
+    Standalone question:`
+};
+
+const QA_PROMPT = (context: string[], question: string) => {
+    return `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
+    You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
+    If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
+    If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+    
+    Question: ${question}
+    =========
+    ${context.join("\n")}
+    =========
+    Answer in Markdown`
+};
+
 
 export const resourceRouter = createTRPCRouter({
     process: protectedProcedure
@@ -15,8 +41,9 @@ export const resourceRouter = createTRPCRouter({
             // eslint-disable-next-line
             const response = await processQueue.add({
                 id: input.entity,
-                type: input.type,
+                type: "embed",
             });
+            // console.log(response);
             const change = await ctx.prisma.info_entity.update({
                 where: {
                     id: input.entity,
@@ -25,7 +52,7 @@ export const resourceRouter = createTRPCRouter({
                     processed: 1,
                 },
             });
-            if(response && change.processed === 1) {
+            if (response && change.processed === 1) {
                 return {
                     message: "success",
                 };
@@ -34,4 +61,129 @@ export const resourceRouter = createTRPCRouter({
                 message: "failed",
             };
         }),
+    createEntity: protectedProcedure.input(
+        z.object({
+            bubble: z.string(),
+            type: z.string(),
+            url: z.string().optional(),
+            data: z.string(),
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const entity = await ctx.prisma.info_entity.create({
+                data: {
+                    bubble: input.bubble,
+                    type: input.type,
+                    url: input.url,
+                    data: input.data,
+                },
+            });
+            const response = await processQueue.add({
+                id: entity.id,
+                type: "count",
+            });
+            if(await response.isFailed() || entity === null) {
+                return {
+                    message: "failed",
+                    data: entity,
+                };
+            }
+            return {
+                message: "success",
+                data: entity,
+            };
+        }
+    ),
+    sendMessage: protectedProcedure.input(
+        z.object({
+            messages: z.array(z.object({
+                role: z.enum([ChatCompletionRequestMessageRoleEnum.Assistant, ChatCompletionRequestMessageRoleEnum.System, ChatCompletionRequestMessageRoleEnum.User]),
+                content: z.string(),
+            })).min(1),
+            bubble_id: z.string(),
+        })
+    ).mutation(async ({ input, ctx }) => {
+        const bubble = await ctx.prisma.bubble.findUnique({
+            where: {
+                id: input.bubble_id,
+            },
+        });
+        if(!bubble || input.messages.length === 0) {
+            console.log("no messages");
+            
+            return {
+                message: "failed",
+                data: null,
+            };
+        }
+        const embeddingResponse = await aiClient.createEmbedding({
+            model: 'text-embedding-ada-002',
+            input: input.messages[input.messages.length - 1]!.content,
+        });
+        const embedding = embeddingResponse.data.data
+            ? embeddingResponse.data.data[0]?.embedding
+            : null;
+        if(!embedding) {
+            console.log("no embedding");
+            return {
+                message: "failed",
+                data: null,
+            };
+        }
+        console.log(bubble.id);
+        
+        const { data: documents, error } = await uSBClient.rpc('match_documents', {
+            query_embedding: embedding,
+            similarity_threshold: 0.78, // Choose an appropriate threshold for your data
+            match_count: 5, // Choose the number of matches
+            bubble_id: bubble.id,
+        });
+        console.log(error);
+        
+        if(!documents) {
+            console.log("no documents");
+            return {
+                message: "failed",
+                data: null,
+            };
+        }
+
+        const resp = await aiClient.createChatCompletion({
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: ChatCompletionRequestMessageRoleEnum.System,
+                    content: `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
+                    You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
+                    Your name is ${bubble.name} and your description is ${bubble.description}.
+                    If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
+                    If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+                    Answer in Markdown.
+                    Use the following context:
+                    ${documents.map((doc) => doc.content).join("\n")}`,
+                },
+                ...input.messages,
+            ],
+        });
+        if(resp.data.choices.length === 0) {
+            console.log("no choices");
+            return {
+                message: "failed",
+                data: null,
+            };
+        }
+        const message = resp.data.choices[0]!.message;
+        console.log(message);
+        
+        return {
+            message: "success",
+            data: {
+                message,
+            },
+        };
+
+        
+        // const resp = await aiClient.createChatCompletion({
+        //     model
+        // })
+    }),
 });

@@ -24,7 +24,8 @@ const server = z.object({
   SUPABASE_JWT_SECRET: z.string().min(1),
   SMTP_SERVER: z.string().min(1),
   SMTP_FROM: z.string().min(1),
-  REDIS_URL: z.string().url(),
+  EDIS_URL: z.string().url(),
+  OPENAI_API_KEY: z.string().min(1),
 });
 
 /**
@@ -55,7 +56,8 @@ const processEnv = {
   SMTP_SERVER: process.env.SMTP_SERVER,
   SMTP_FROM: process.env.SMTP_FROM,
   SHADOW_DATABASE_URL: process.env.SHADOW_DATABASE_URL,
-  REDIS_URL: process.env.REDIS_URL,
+  EDIS_URL: process.env.REDIS_URL,
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 

@@ -50,13 +50,18 @@ export const authOptions: NextAuthOptions = {
     // },
     session({ session, user }) {
       const signingSecret = env.SUPABASE_JWT_SECRET;
+      // console.log(signingSecret);
+      
       if (signingSecret) {
         const payload = {
+          iss: "supabase",
+          role: "authenticated",
           aud: "authenticated",
           exp: Math.floor(new Date(session.expires).getTime() / 1000),
+          iat: Math.floor(new Date().getTime() / 1000),
+          // nbf: 0,
           sub: user.id,
           email: user.email,
-          role: "authenticated",
         }
         session.supabaseAccessToken = jwt.sign(payload, signingSecret)
       }

@@ -14,6 +14,8 @@ import x from "~/assets/x.svg";
 import check from "~/assets/check.svg";
 import nProgress from "nprogress";
 import { api } from "~/utils/api";
+import { useSession } from "next-auth/react";
+import Try from "~/components/Try";
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -31,7 +33,9 @@ type Bubble = {
               id: string;
               type: string;
               data: string;
+              url: string | null;
               created_at: string;
+              tokens: number | null;
               // 0: not processed, 1: getting processed, 2: processed
               processed: number;
           }[]
@@ -42,6 +46,7 @@ type InfoEntity = {
     id?: string;
     type: string;
     data: string;
+    url?: string;
     created_at?: string;
     // 0: not processed, 1: getting processed, 2: processed
     processed: number;
@@ -52,6 +57,8 @@ const headers = ["Info", "URLs/texts", "Integration", "Try now!", "Settings"];
 const BubblePage = () => {
     const router = useRouter();
     const supabase = useCLient();
+    const session = useSession();
+
     const { id } = router.query;
     const [bubble, setBubble] = useState<Bubble>({
         id: "",
@@ -68,6 +75,7 @@ const BubblePage = () => {
         type: "",
     });
     const processing = api.entity.process.useMutation();
+    const createEntity = api.entity.createEntity.useMutation();
     const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
     const [info, setInfo] = useState<InfoEntity>({
         type: "text",
@@ -111,10 +119,52 @@ const BubblePage = () => {
         nProgress.done();
     };
 
-
     useEffect(() => {
         if (id) {
             void getBubble();
+            // supabase.
+            const channel = supabase
+                .channel("custom-update-channel")
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "UPDATE",
+                        schema: "public",
+                        table: "info_entity",
+                    },
+                    (payload) => {
+                        // console.log("Payload", payload);
+                        const { new: newRecord } = payload;
+                        const {
+                            id,
+                            processed,
+                            tokens,
+                        }: { id: string; processed: number; tokens: number } =
+                            newRecord as {
+                                id: string;
+                                processed: number;
+                                tokens: number;
+                            };
+                            setBubble((prev) => {
+                                const info_entity = prev.info_entity?.map((info) => {
+                                    if (info.id === id) {
+                                        info.processed = processed;
+                                        info.tokens = tokens;
+                                    }
+                                    return info;
+                                });
+                                return {
+                                    ...prev,
+                                    info_entity: info_entity ? info_entity : null,
+                                };
+                            });
+                        }
+                )
+                .subscribe();
+                if(session.status === "authenticated" && session.data?.supabaseAccessToken) {
+                    channel.socket.accessToken = session.data?.supabaseAccessToken;
+                }
+            // };
         }
     }, [id]);
 
@@ -123,7 +173,7 @@ const BubblePage = () => {
             void (async () => {
                 const resp = await processing.mutateAsync({
                     entity: process.id,
-                    type: process.type,
+                    type: "count",
                 });
                 if (resp) {
                     toast.success("Processing started");
@@ -135,7 +185,6 @@ const BubblePage = () => {
                     type: "",
                 });
             })();
-
         }
     }, [process]);
 
@@ -148,44 +197,58 @@ const BubblePage = () => {
     };
 
     const addInfo = () => {
-        void (
-            async () => {
-                nProgress.set(0.3);
-                nProgress.start();
-                const tt = info.type === "text" ? {
-                    data: info.data,
-                } : {
-                    url: info.data,
-                }
-                const { data, error } = await supabase
-                    .from("info_entity")
-                    .insert({
-                        ...tt,
-                        type: info.type,
-                        bubble: bubble.id,
-                    })
-                    .select();
-                    
-                if (error) {
-                    toast.error(error.message);
-                }
-                if (data && data.length > 0) {
-                    toast.success("Info added successfully");
-                    setInfo({
-                        type: "text",
-                        data: "",
-                        processed: 0,
-                    });
-                    const entities = bubble.info_entity ? bubble.info_entity : [];
-                    setBubble({
-                        ...bubble,
-                        info_entity: [...entities, data[0]!],
-                    });
-                    closeModal();
-                }
-                nProgress.done();
+        void (async () => {
+            nProgress.set(0.3);
+            nProgress.start();
+            const tt =
+                info.type === "text"
+                    ? {
+                          data: info.data,
+                      }
+                    : {
+                          url: info.data,
+                          data: "",
+                      };
+            // const { data, error } = await supabase
+            //     .from("info_entity")
+            //     .insert({
+            //         ...tt,
+            //         type: info.type,
+            //         bubble: bubble.id,
+            //     })
+            //     .select();
+            const { data, message } = await createEntity.mutateAsync({
+                ...tt,
+                type: info.type,
+                bubble: bubble.id,
+            });
+
+            if (message === "failed") {
+                toast.error(message);
             }
-        )();
+            if (data) {
+                toast.success("Info added successfully");
+                setInfo({
+                    type: "text",
+                    data: "",
+                    processed: 0,
+                });
+                const entities = bubble.info_entity ? bubble.info_entity : [];
+                setBubble({
+                    ...bubble,
+                    info_entity: [
+                        ...entities,
+                        {
+                            ...data,
+                            created_at: new Date(data.created_at).toISOString(),
+                            tokens: Number(data.tokens),
+                        },
+                    ],
+                });
+                closeModal();
+            }
+            nProgress.done();
+        })();
     };
 
     return (
@@ -555,21 +618,23 @@ const BubblePage = () => {
                                             key={index}
                                         >
                                             <div className="flex flex-row gap-6 bg-red-800 px-2 py-5 sm:px-4">
-                                                <div className="flex flex-row justify-between items-center w-full">
+                                                <div className="flex w-full flex-row items-center justify-between">
                                                     <h3
                                                         className={
                                                             "text-2xl font-medium leading-6 text-white " +
                                                             poppins.className
                                                         }
                                                     >
-                                                        {info?.type.charAt(0).toUpperCase() + info?.type.slice(1)}
+                                                        {info?.type
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                            info?.type.slice(1)}
                                                     </h3>
                                                     {/* Process button */}
-                                                    {
-                                                        info.processed === 0 && (
+                                                    {info.processed === 0 ? (
                                                         <button
                                                             className={
-                                                                "my-auto disabled:brightness-90 disabled:cursor-not-allowed rounded bg-white py-2 px-4 font-bold text-red-800 hover:bg-red-50 " +
+                                                                "my-auto rounded bg-white py-2 px-4 font-bold text-red-800 hover:bg-red-50 disabled:cursor-not-allowed disabled:brightness-90 " +
                                                                 poppins.className
                                                             }
                                                             // disabled={info.processed !== 0 || loading[info.id]}
@@ -582,17 +647,28 @@ const BubblePage = () => {
                                                                 });
                                                                 setLoading({
                                                                     ...loading,
-                                                                    [info.id]: true,
+                                                                    [info.id]:
+                                                                        true,
                                                                 });
                                                                 setBubble({
                                                                     ...bubble,
-                                                                    info_entity: bubble?.info_entity ? bubble?.info_entity?.map((i) => {
-                                                                        if (i.id === info.id) {
-                                                                            i.processed = 1;
-                                                                        }
-                                                                        return i;
-                                                                    }) : null,
-                                                                })
+                                                                    info_entity:
+                                                                        bubble?.info_entity
+                                                                            ? bubble?.info_entity?.map(
+                                                                                  (
+                                                                                      i
+                                                                                  ) => {
+                                                                                      if (
+                                                                                          i.id ===
+                                                                                          info.id
+                                                                                      ) {
+                                                                                          i.processed = 1;
+                                                                                      }
+                                                                                      return i;
+                                                                                  }
+                                                                              )
+                                                                            : null,
+                                                                });
                                                             }}
                                                         >
                                                             <svg
@@ -609,8 +685,17 @@ const BubblePage = () => {
                                                             </svg>
                                                             Process
                                                         </button>
-                                                        )
-                                                    }
+                                                    ) : info.processed === 2 ? (
+                                                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                                                        <Image src={check} width={30} height={30} alt="check mark" className="bg-white p-1 rounded-md" />
+                                                    ) : (
+                                                        <Lottie
+                                                            animationData={
+                                                                loadingAnimation
+                                                            }
+                                                            className="w-8 bg-white rounded-md p-1"
+                                                        />
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="border-t border-gray-200">
@@ -622,18 +707,54 @@ const BubblePage = () => {
                                                                 lato.className
                                                             }
                                                         >
-                                                            {
-                                                                info?.type.charAt(0).toUpperCase() +
-                                                                info?.type.slice(1)
-                                                            }
+                                                            {info?.type
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                                info?.type.slice(
+                                                                    1
+                                                                )}
                                                         </dt>
                                                         <dd
                                                             className={
-                                                                "mt-1 mx-auto flex items-start text-sm text-gray-900 sm:col-span-2 sm:mt-0 " +
+                                                                "mx-auto mt-1 flex items-start text-sm text-gray-900 sm:col-span-2 sm:mt-0 " +
                                                                 lato.className
                                                             }
                                                         >
-                                                            {info?.data}
+                                                            {info?.type ===
+                                                            "URL" ? (
+                                                                <a
+                                                                    href={
+                                                                        info?.url
+                                                                            ? info?.url
+                                                                            : "#"
+                                                                    }
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    className={
+                                                                        "text-blue-500 hover:text-blue-700 " +
+                                                                        poppins.className
+                                                                    }
+                                                                >
+                                                                    {info?.url}
+                                                                </a>
+                                                            ) : (
+                                                                <p
+                                                                    className={
+                                                                        lato.className
+                                                                    }
+                                                                >
+                                                                    {/* truncate data to 20 characters */}
+                                                                    {info?.data.substring(
+                                                                        0,
+                                                                        20
+                                                                    ) +
+                                                                        (info?.data
+                                                                            .length >
+                                                                        20
+                                                                            ? "..."
+                                                                            : "")}
+                                                                </p>
+                                                            )}
                                                         </dd>
                                                     </div>
                                                     <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -643,9 +764,72 @@ const BubblePage = () => {
                                                                 lato.className
                                                             }
                                                         >
+                                                            Tokens:
+                                                        </dt>
+                                                        <dd>
+                                                            {/* Display number of tokens */}
+                                                                {info?.tokens ? (
+                                                                    <p
+                                                                        className={
+                                                                            "text-md font-medium text-gray-500 " +
+                                                                            lato.className
+                                                                        }
+                                                                    >
+                                                                        {`${
+                                                                            info?.tokens
+                                                                        } tokens`}
+                                                                    </p>
+                                                                ) : (
+                                                                    <Lottie
+                                                                        animationData={
+                                                                            loadingAnimation
+                                                                        }
+                                                                        className="w-6"
+                                                                    />
+                                                                )}                                                        </dd>
+                                                    </div>
+                                                    <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                        <dt
+                                                            className={
+                                                                "text-md font-medium text-gray-500 " +
+                                                                lato.className
+                                                            }
+                                                        >
+                                                            Cost:
+                                                        </dt>
+                                                        <dd>
+                                                            {/* Display cost */}
+                                                                {info?.tokens ? (
+                                                                    <p
+                                                                        className={
+                                                                            "text-md font-medium text-gray-500 " +
+                                                                            lato.className
+                                                                        }
+                                                                    >
+                                                                        {`${
+                                                                            (info?.tokens * 0.0004/1000).toFixed(6)
+                                                                        }$`}
+                                                                    </p>
+                                                                ) : (
+                                                                    <Lottie
+                                                                        animationData={
+                                                                            loadingAnimation
+                                                                        }
+                                                                        className="w-6"
+                                                                    />
+                                                                )}    
+                                                        </dd>
+                                                    </div>    
+                                                    {/* <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                        <dt
+                                                            className={
+                                                                "text-md font-medium text-gray-500 " +
+                                                                lato.className
+                                                            }
+                                                        >
                                                             Processed
                                                         </dt>
-                                                        <dd
+                                                        {/* <dd
                                                             className={
                                                                 "mt-1 mx-auto text-sm text-gray-900 sm:col-span-2 sm:mt-0 " +
                                                                 lato.className
@@ -664,14 +848,18 @@ const BubblePage = () => {
                                                                     )
                                                                 )
                                                             }
-                                                        </dd>
-                                                    </div>
+                                                        </dd> * /}
+                                                    </div> */}
                                                 </dl>
                                             </div>
                                         </div>
                                     ))
                                 )}
                             </div>
+                        </div>
+                        <div></div>
+                        <div className="flex flex-col w-full bg-red-50">
+                            <Try name={bubble?.name} bubble={bubble?.id} />
                         </div>
                     </Navigation>
                 </div>
