@@ -56,7 +56,7 @@ const processEnv = {
   SMTP_SERVER: process.env.SMTP_SERVER,
   SMTP_FROM: process.env.SMTP_FROM,
   SHADOW_DATABASE_URL: process.env.SHADOW_DATABASE_URL,
-  EDIS_URL: process.env.REDIS_URL,
+  EDIS_URL: process.env.EDIS_URL,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
