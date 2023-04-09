@@ -89,6 +89,8 @@ export const resourceRouter = createTRPCRouter({
                     data: entity,
                 };
             }
+            console.log('returning now');
+            
             return {
                 message: "success",
                 data: entity,
