@@ -25,7 +25,7 @@ const scrapePage = async (url: string) => {
     return text;
 };
 
-const CHUNK_SIZE = 500;
+const CHUNK_SIZE = 1000;
 const SLICE_SIZE = 100;
 
 export const countTokens = (text: string) => {
@@ -52,28 +52,31 @@ export const createEmbeddings = async (text: string, entity: string, bubble: str
     }
 
     for (const chunk of chunks) {
-        const input = chunk
-            .map((doc) => doc.pageContent)
-            .join(" ")
-            .replace(/\n/g, " ");
-        const embeddingResp = await aiClient.createEmbedding({
-            input,
-            model: "text-embedding-ada-002",
-        });
-        // console.log(embeddingResp.data.data);
-
-        const embedding = embeddingResp.data.data
-            ? embeddingResp.data.data[0]?.embedding
-            : null;
-        if (embedding) {
-            console.log(embedding);
-            const resp = await supabase.from("embeddings").insert({
-                content: input,
-                embedding,
-                entity,
-                bubble
+        for(const doc of chunk) {
+        // const input = chunk
+        //     .map((doc) => doc.pageContent)
+        //     .join(" ")
+        //     .replace(/\n/g, " ");
+            const input = doc.pageContent.replace(/\n/g, " ");
+            const embeddingResp = await aiClient.createEmbedding({
+                input,
+                model: "text-embedding-ada-002",
             });
-            console.log(resp);
+            // console.log(embeddingResp.data.data);
+
+            const embedding = embeddingResp.data.data
+                ? embeddingResp.data.data[0]?.embedding
+                : null;
+            if (embedding) {
+                console.log(embedding);
+                const resp = await supabase.from("embeddings").insert({
+                    content: input,
+                    embedding,
+                    entity,
+                    bubble
+                });
+                console.log(resp);
+            }
         }
     }
     return true;
