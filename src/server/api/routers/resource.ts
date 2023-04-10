@@ -111,6 +111,8 @@ export const resourceRouter = createTRPCRouter({
                 id: input.bubble_id,
             },
         });
+        console.log(bubble);
+        
         if(!bubble || input.messages.length === 0) {
             console.log("no messages");
             
@@ -133,57 +135,70 @@ export const resourceRouter = createTRPCRouter({
                 data: null,
             };
         }
-        console.log(bubble.id);
+        // console.log(bubble.id, embedding);
         
-        const { data: documents, error } = await uSBClient.rpc('match_documents', {
+        const { data: docs, error } = await uSBClient.rpc('match_documents', {
             query_embedding: embedding,
             similarity_threshold: 0.78, // Choose an appropriate threshold for your data
             match_count: 5, // Choose the number of matches
             bubble_id: bubble.id,
         });
-        console.log(error);
-        
+        let documents = docs;
         if(!documents) {
             console.log("no documents");
-            return {
-                message: "failed",
-                data: null,
-            };
+            documents = [];
         }
+        try {
 
-        const resp = await aiClient.createChatCompletion({
-            model: 'gpt-3.5-turbo',
-            messages: [
-                {
-                    role: ChatCompletionRequestMessageRoleEnum.System,
-                    content: `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
-                    You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
-                    Your name is ${bubble.name} and your description is ${bubble.description}.
-                    If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
-                    If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
-                    Answer in Markdown.
-                    Use the following context:
-                    ${documents.map((doc) => doc.content).join("\n")}`,
+            const resp = await aiClient.createChatCompletion({
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    {
+                        role: ChatCompletionRequestMessageRoleEnum.System,
+                        content: `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
+                        You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
+                        Your name is ${bubble.name} and your description is ${bubble.description}.
+                        If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
+                        If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+                        Answer in Markdown.
+                        Use the following context without explicitly mentioning it:
+                        ${documents.map((doc) => doc.content).join("\n")}`,
+                    },
+                    ...input.messages,
+                ],
+                top_p: 1,
+                temperature: 0.5,
+    
+            });
+            if(resp.data.choices.length === 0) {
+                console.log("no choices");
+                return {
+                    message: "failed",
+                    data: null,
+                };
+            }
+            const message = resp.data.choices[0]!.message;
+            console.log(message);
+            
+            return {
+                message: "success",
+                data: {
+                    message,
                 },
-                ...input.messages,
-            ],
-        });
-        if(resp.data.choices.length === 0) {
-            console.log("no choices");
+            };
+        } catch (err) {
+            // const error = err as AxiosError;
+            // if (err.response) {
+            //     console.log(err.response.status);
+            //     console.log(error.response.data);
+            //   } else {
+            //     console.log(error.message);
+            //   }
             return {
                 message: "failed",
                 data: null,
             };
         }
-        const message = resp.data.choices[0]!.message;
-        console.log(message);
-        
-        return {
-            message: "success",
-            data: {
-                message,
-            },
-        };
 
         
         // const resp = await aiClient.createChatCompletion({

@@ -5,6 +5,7 @@ import { api } from "~/utils/api";
 import { toast } from "react-toastify";
 import loadingAnimation from "~/assets/sloading.json";
 import Lottie from "lottie-react";
+import ReactMarkdown from 'react-markdown';
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -80,13 +81,13 @@ const Try = ({ name, bubble }: { name: string, bubble: string }) => {
         };
     });
     return (
-        <div>
-            <div className="flex flex-row gap-6 bg-red-800 px-4 py-5 sm:px-6 rounded-t-lg">
+        <div className="h-[50vh]">
+            <div className="flex flex-row gap-6 bg-red-800 px-4 py-3 sm:px-6 rounded-t-lg">
                 <Image
                     className="aspect-square rounded-full bg-white shadow-md"
                     src={`https://avatars.dicebear.com/api/micah/${name}.svg`}
-                    width={100}
-                    height={100}
+                    width={80}
+                    height={80}
                     alt="Bubble"
                 />
                 <div className="flex flex-col justify-end">
@@ -101,8 +102,8 @@ const Try = ({ name, bubble }: { name: string, bubble: string }) => {
                     </div>
                 </div>
             </div>
-            <div className="bg-red-100 px-4 py-5 sm:p-6 rounded-b-lg">
-                <div className="flex flex-col gap-4 md:h-60 overflow-y-auto">
+            <div className="bg-red-100 px-4 py-5 sm:p-6 rounded-b-lg h-full">
+                <div className="flex flex-col gap-4 md:h-full overflow-y-auto h-full">
                     {messages.map((message) => (
                         <div
                             key={message.id}
@@ -122,7 +123,9 @@ const Try = ({ name, bubble }: { name: string, bubble: string }) => {
                                 }
                             >
                                 <div className={poppins.className}>
-                                    {message.content}
+                                    <ReactMarkdown className="">
+                                        {message.content}
+                                    </ReactMarkdown>
                                 </div>
                                 <div className={lato.className}>
                                     {message.timestamp}

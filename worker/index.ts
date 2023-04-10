@@ -9,7 +9,7 @@ import { prisma } from './db.js';  // TODO: share this with the server?
 import scrapePage, { countTokens, createEmbeddings } from './services/process.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-const processQueue = new Bull('prc', {
+const processQueue = new Bull('prc', process.env.EDIS_URL!, {
     settings: {
         stalledInterval: 3000, // How often check for stalled jobs (use 0 for never checking).
         guardInterval: 2000, // Poll interval for delayed jobs and added jobs.
