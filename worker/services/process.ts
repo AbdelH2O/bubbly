@@ -25,7 +25,7 @@ const scrapePage = async (url: string) => {
     return text;
 };
 
-const CHUNK_SIZE = 5000;
+const CHUNK_SIZE = 500;
 const SLICE_SIZE = 100;
 
 export const countTokens = (text: string) => {
