@@ -79,7 +79,7 @@ export const resourceRouter = createTRPCRouter({
             });
             console.log("entity", entity);
             
-            void processQueue.add({
+            await processQueue.add({
                 id: entity.id,
                 type: "count",
             });
