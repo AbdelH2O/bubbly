@@ -11,27 +11,27 @@ import aiClient from "~/utils/openAIclient";
 import uSBClient from "~/utils/utilitySupabase";
 import { ChatCompletionRequestMessageRoleEnum } from "openai/dist/api";
 
-const CONDENSE_PROMPT = (history: string[], question: string) => {
-    return `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
+// const CONDENSE_PROMPT = (history: string[], question: string) => {
+//     return `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
 
-    Chat History:
-    ${history.join("\n")}
-    Follow Up Input: ${question}
-    Standalone question:`
-};
+//     Chat History:
+//     ${history.join("\n")}
+//     Follow Up Input: ${question}
+//     Standalone question:`
+// };
 
-const QA_PROMPT = (context: string[], question: string) => {
-    return `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
-    You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
-    If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
-    If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+// const QA_PROMPT = (context: string[], question: string) => {
+//     return `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
+//     You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
+//     If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
+//     If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
     
-    Question: ${question}
-    =========
-    ${context.join("\n")}
-    =========
-    Answer in Markdown`
-};
+//     Question: ${question}
+//     =========
+//     ${context.join("\n")}
+//     =========
+//     Answer in Markdown`
+// };
 
 
 export const resourceRouter = createTRPCRouter({
@@ -97,7 +97,7 @@ export const resourceRouter = createTRPCRouter({
             };
         }
     ),
-    sendMessage: protectedProcedure.input(
+    sendMessage: publicProcedure.input(
         z.object({
             messages: z.array(z.object({
                 role: z.enum([ChatCompletionRequestMessageRoleEnum.Assistant, ChatCompletionRequestMessageRoleEnum.System, ChatCompletionRequestMessageRoleEnum.User]),
@@ -139,11 +139,13 @@ export const resourceRouter = createTRPCRouter({
         
         const { data: docs, error } = await uSBClient.rpc('match_documents', {
             query_embedding: embedding,
-            similarity_threshold: 0.78, // Choose an appropriate threshold for your data
+            similarity_threshold: 0.7, // Choose an appropriate threshold for your data
             match_count: 5, // Choose the number of matches
             bubble_id: bubble.id,
         });
         let documents = docs;
+        // console.log(docs);
+        // console.log(error);
         if(!documents) {
             console.log("no documents");
             documents = [];
@@ -198,6 +200,12 @@ export const resourceRouter = createTRPCRouter({
                 message: "failed",
                 data: null,
             };
+        // }
+        // return {
+        //     message: "success",
+        //     data: {
+        //         message: "Hello",
+        //     },
         }
 
         

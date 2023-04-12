@@ -9,7 +9,7 @@ import EmailProvider from "next-auth/providers/email";
 // import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import { env } from "~/env.mjs";
-import { prisma } from "~/server/db";
+// import { prisma } from "~/server/db";
 import jwt from "jsonwebtoken";
 
 /**

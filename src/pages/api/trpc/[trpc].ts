@@ -24,11 +24,12 @@ export default function handler(
   res: NextApiResponse,
 ) {
   // We can use the response object to enable CORS
+  // console.log(req.url);
   if(req.url?.includes('api/trpc/entity.sendMessage')) {
-
+    
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
     res.setHeader('Access-Control-Allow-Headers', '*');
   }
   // If you need to make authenticated CORS calls then
@@ -40,10 +41,10 @@ export default function handler(
   // res.setHeader('Access-Control-Allow-Headers', 'content-type');
   // res.setHeader('Referrer-Policy', 'no-referrer');
   // res.setHeader('Access-Control-Allow-Credentials', 'true');
-  // if (req.method === 'OPTIONS') {
-  //   res.writeHead(200);
-  //   return res.end();
-  // }
+  if (req.method === 'OPTIONS') {
+    res.writeHead(200);
+    return res.end();
+  }
   // finally pass the request on to the tRPC handler
   return nextApiHandler(req, res);
 }

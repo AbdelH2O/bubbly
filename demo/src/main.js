@@ -1,6 +1,8 @@
 import template from './views/index.html';
 import './views/index.css';
 
+const supportedAPI = ['init'];
+
 let messages = [{
     id: 0,
     role: 'assistant',
@@ -15,6 +17,8 @@ messages.push = function() {
 };
 
 let interval;
+
+let bubble = '';
 
 function render() {
     const chatArea = document.querySelector('#chatbox__body');
@@ -60,10 +64,22 @@ function render() {
 
 
 let id = 1;
-let body;
+
 const url = 'https://bbly.vercel.app/api/trpc/entity.sendMessage?batch=1';
 
 function app(window) {
+    let globalObject = window[window['MyWidget']];
+    let queue = globalObject.q;
+    if (queue) {
+        for (var i = 0; i < queue.length; i++) {
+            if (queue[i][0].toLowerCase() == 'init') {
+                bubble = queue[i][1].bubble_id;
+            }
+            else
+                apiHandler(queue[i][0], queue[i][1]);
+        }
+    }
+    globalObject = apiHandler;
     const { document } = window;
 
     const el = document.createElement('div');
@@ -92,21 +108,21 @@ function app(window) {
     const sendMessage = document.querySelector('#send_message');
     sendMessage.addEventListener('click', () => {
         const text = document.querySelector('#message').value;
-        send(text, 0);
+        send(text);
         document.querySelector('#message').value = '';
     });
     // listen for enter key press to send message and clear input while the chat area is not hidden
     document.querySelector('#message').addEventListener('keyup', (e) => {
         if (e.key === 'Enter' && !chatArea.classList.contains('hide')) {
             const text = document.querySelector('#message').value;
-            send(text, 0);
+            send(text);
             document.querySelector('#message').value = '';
         }
     });
-    console.log('Hello, World!');
+    // console.log('Hello, World!');
 }
 
-function send(text, bubble) {
+function send(text) {
     messages.push({
         id: id++,
         role: 'user',
@@ -162,12 +178,42 @@ function send(text, bubble) {
         messages.push({
             id: id++,
             role: 'assistant',
-            content: data.text,
+            content: data[0].result.data.json.data.message.content,
             timestamp: new Date().toLocaleTimeString(),
         });
+        document.querySelector('#send_message').disabled = false;
+        document.querySelector('#send_message').classList.toggle('disabled');
+        
+        // clear the loading animation
+        clearInterval(interval);
     }).catch((error) => {
         console.error(error);
     });
 }
+
+function apiHandler(api, params) {
+    if (!api) throw Error('API method required');
+    api = api.toLowerCase();
+
+    if (supportedAPI.indexOf(api) === -1) throw Error(`Method ${api} is not supported`);
+
+    console.log(`Handling API call ${api}`, params);
+
+    switch (api) {
+        // TODO: add API implementation
+        case 'message':
+            // show(params);
+            break;
+        default:
+            console.warn(`No handler defined for ${api}`);
+    }
+}
+
+// function extendObject(a, b) {
+//     for (var key in b)
+//         if (b.hasOwnProperty(key))
+//             a[key] = b[key];
+//     return a;
+// }
 
 app(window);
