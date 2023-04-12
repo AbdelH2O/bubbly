@@ -399,7 +399,7 @@ const BubblePage = () => {
                                                             poppins.className
                                                         }
                                                     >
-                                                        Add New Bubble
+                                                        Add New resource
                                                         <span className="float-right">
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -423,8 +423,8 @@ const BubblePage = () => {
                                                                 lato.className
                                                             }
                                                         >
-                                                            Create a new bubble
-                                                            to add content to.
+                                                            Create a new resource
+                                                            to add content to your chatbot.
                                                         </p>
                                                     </Dialog.Title>
                                                     <div className="mt-4 px-6">

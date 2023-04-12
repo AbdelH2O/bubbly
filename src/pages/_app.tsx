@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import AuthGuard from "~/components/layouts/AuthGuard";
 import { ToastContainer } from 'react-toastify';
 import Loader from "~/components/Loader";
+import { Analytics } from '@vercel/analytics/react';
 
 import { api } from "~/utils/api";
 
@@ -19,6 +20,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <AuthGuard>
         <Loader />
         <Component {...pageProps} />
+        <Analytics />
         <ToastContainer />
       </AuthGuard>
     </SessionProvider>
