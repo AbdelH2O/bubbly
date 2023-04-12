@@ -16,6 +16,13 @@ import nProgress from "nprogress";
 import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
 import Try from "~/components/Try";
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { MDXRemote } from 'next-mdx-remote';
+// import Heading from '../components/heading';
+
+// const components = { Heading };
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -857,7 +864,10 @@ const BubblePage = () => {
                                 )}
                             </div>
                         </div>
-                        <div></div>
+                        <div className="flex flex-col w-full bg-red-50">
+                            {/* display copyable code the user needs to add the widget to their website */}
+                            <Code bubble={bubble?.id} />
+                        </div>
                         <div className="flex flex-col w-full bg-red-50">
                             <Try name={bubble?.name} bubble={bubble?.id} />
                         </div>
@@ -865,6 +875,90 @@ const BubblePage = () => {
                 </div>
             </main>
         </Layout>
+    );
+};
+
+const snippet = (bubble: string) => {
+    return `
+    <script src="https://cdn.jsdelivr.net/npm/bbly-bubble@latest/dist/widget.js"></script>
+    <script>
+        (function (w,d,s,o,f,js,fjs) {
+            w['MyWidget']=o;w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
+            js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
+            js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
+        }(window, document, 'script', 'mw', './widget.js'));
+        mw('init', { bubble_id: '${bubble}' });
+    </script>
+    `;
+    // return `# hello`
+};
+
+const Code = ({ bubble }: { bubble: string }) => {
+    const [copied, setCopied] = useState(false);
+
+    
+    const copyToClipboard = () => {
+        void (async () => navigator.clipboard.writeText(snippet(bubble)))();
+        setCopied(true);
+    };
+
+    return (
+        <div className="flex flex-col w-full bg-red-50">
+            <h2 className={"text-2xl font-bold text-center text-white bg-red-700 p-4 " + poppins.className}>
+                Copy the code below and paste it into your website
+            </h2>
+            {/* <MDXRemote {...source} components={components} /> */}
+            {/* display code area as markdown */}
+        <ReactMarkdown
+        
+            className="p-4"
+            // eslint-disable-next-line react/no-children-prop
+            children={snippet(bubble)}
+            components={{
+                code({node, inline, className, children, ...props}) {
+                console.log(node);
+                    
+                  const match = /language-(\w+)/.exec(className || '');
+                  console.log(match);
+                  
+                  return !inline && match ? (
+                    <SyntaxHighlighter
+                      {...props}
+                      // eslint-disable-next-line react/no-children-prop
+                      children={String(children).replace(/\n$/, '')}
+                      style={dark}
+                      language={'javascript'}
+                      PreTag="div"
+                    />
+                  ) : (
+                    <code {...props} className={'language-javascript'}>
+                      {children}
+                    </code>
+                  )
+                }
+              }}
+        />
+                {/* {`\`\`\`javascript
+<script src="https://cdn.jsdelivr.net/npm/bbly-bubble@latest/dist/widget.js"></script>
+<script>
+    (function (w,d,s,o,f,js,fjs) {
+        w['MyWidget']=o;w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
+        js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
+        js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
+    }(window, document, 'script', 'mw', './widget.js'));
+    mw('init', { bubble_id: '${bubble}' });
+</script>
+\`\`\``}
+            </ReactMarkdown> */}
+            {/* display copy button */}
+            <button
+                type="button"
+                className={"bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded " + poppins.className}
+                onClick={copyToClipboard}
+            >
+                {copied ? "Copied!" : "Copy"}
+            </button>
+        </div>
     );
 };
 

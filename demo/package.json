@@ -1,5 +1,9 @@
 {
-    "name": "script-tag",
+    "name": "bbly-bubble",
+    "version": "1.0.0",
+    "description": "A simple example of how to use script tag in webpack",
+    "author": "@AbdelH2O",
+    "main": "dist/widget.js",
     "scripts": {
         "build": "./node_modules/.bin/webpack --config webpack.config.js",
         "build-release": "./node_modules/.bin/webpack --config webpack.config.js --env.prod",
@@ -15,5 +19,8 @@
         "style-loader": "^0.19.0",
         "webpack": "^3.8.1",
         "webpack-dev-server": "^2.9.4"
-    }
+    },
+    "files": [
+        "dist"
+    ]
 }
