@@ -28,7 +28,7 @@ export default function handler(
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST');
     res.setHeader('Access-Control-Allow-Headers', '*');
   }
   // If you need to make authenticated CORS calls then
