@@ -56,6 +56,7 @@ void processQueue.process(async (job, done) => {
             data: {
                 ...tt,
                 tokens,
+                processed: 0,
             },
         });
         return done();

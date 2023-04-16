@@ -33,7 +33,7 @@ export const countTokens = (text: string) => {
     // const tokens = tokenizer.encode(text);
     // return tokens.bpe.length;
     const tokens = encode(text);
-    return tokens.length;
+    return tokens.length + Math.floor(tokens.length / CHUNK_SIZE) * 100;
 };
 
 export const createEmbeddings = async (text: string, entity: string, bubble: string) => {
