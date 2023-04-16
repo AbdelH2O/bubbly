@@ -86,7 +86,7 @@ export const resourceRouter = createTRPCRouter({
                 },
                 data: {
                     usage: {
-                        increment: Number(entity.tokens),
+                        increment: Math.floor(Number(entity.tokens)),
                     },
                 },
             });
@@ -203,10 +203,11 @@ export const resourceRouter = createTRPCRouter({
             },
             select: {
                 usage: true,
+                max_usage: true,
             },
         });
         console.log(previousUsage);
-        if(Number(usage._sum.tokens) + input.messages[input.messages.length - 1]!.content.length/4 + (Number(previousUsage?.usage) || 0)) {
+        if(Number(usage._sum.tokens) + input.messages[input.messages.length - 1]!.content.length/4 + (Number(previousUsage?.usage) || 0) > Number(previousUsage?.max_usage)) {
             console.log("over usage");
             return {
                 message: "over_usage",
@@ -218,7 +219,7 @@ export const resourceRouter = createTRPCRouter({
                 id: bubble.owner ? bubble.owner : "",
             },
             data: {
-                usage: Number(usage._sum.tokens) + input.messages[input.messages.length - 1]!.content.length/4 + (Number(previousUsage?.usage) || 0),
+                usage: Math.floor(Number(usage._sum.tokens) + input.messages[input.messages.length - 1]!.content.length/4 + (Number(previousUsage?.usage) || 0)),
             },
         });
         const embeddingResponse = await aiClient.createEmbedding({
@@ -296,7 +297,7 @@ export const resourceRouter = createTRPCRouter({
                 },
                 data: {
                     usage: {
-                        increment: content.length/4,
+                        increment: Math.floor(content.length/4),
                     },
                 },
             });
