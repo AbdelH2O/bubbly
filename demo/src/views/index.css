@@ -1,21 +1,28 @@
 .bbly {
     /* background: #fee2e2; */
     background-size: 100%;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
     margin: 0 15px 15px 0;
     z-index: 1;
-    /* overflow: hidden; */
-    /* add a shadow effect */
-    /* position: relative; */
 }
 
-.img {
-    border-radius: 99rem;
+.imgg {
+    border-radius: 999px;
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1),
         0 2px 4px -2px rgb(0 0 0 / 0.1);
+    height: 60px;
+    width: 60px;
+}
+
+/* For mobile devices, adjust size */
+@media only screen and (max-width: 600px) {
+    .imgg {
+        height: 70px;
+        width: 70px;
+    }
 }
 
 .bubble {
@@ -55,14 +62,29 @@
     height: 450px;
     width: 400px;
     resize: both;
-
+    
     background-color: #fee2e2;
     border: rgb(0 0 0 / 0.1) solid 1px;
     border-radius: 0.5rem;
+    border-bottom-left-radius: 0;
+}
+/* For mobile devices, go fullscreen */
+@media only screen and (max-width: 600px) {
+    .chatarea {
+        /* position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        top: 0; */
+        height: 80vh;
+        width: 90vw;
+        /* border-radius: 0;
+        border-bottom-left-radius: 0; */
+    }
 }
 
 .top {
-    height: 100px;
+    height: 90%;
     width: 100%;
     background-color: #b91c1c;
     border-radius: 0.5rem 0.5rem 0 0;
@@ -107,12 +129,22 @@
 }
 
 .chat {
-    height: 400px;
+    height: 90%;
+    /* height: 400px; */
     width: 100%;
     background-color: #fee2e2;
     border-radius: 0 0 0.5rem 0.5rem;
     /* padding: 1rem; */
     overflow-y: scroll;
+}
+
+@media only screen and (max-width: 600px) {
+    .chat {
+        height: 80vh;
+        width: 90vw;
+        /* border-radius: 0;
+        border-bottom-left-radius: 0; */
+    }
 }
 
 .chatbox {
@@ -122,6 +154,12 @@
     border-radius: 0.5rem;
     /* padding: 1rem; */
     overflow-y: scroll;
+}
+
+@media only screen and (max-width: 600px) {
+    .chatbox {
+        height: 90%;
+    }
 }
 
 .chatbox__body {
@@ -141,6 +179,7 @@
 .chatbox__body__message {
     display: flex;
     align-items: flex-start;
+    margin-bottom: 0.75rem;
     /* margin-bottom: 1rem; */
     /* max-width: 80%; */
     /* width: ; */
@@ -209,6 +248,7 @@
     word-wrap: break-word;
     word-break: break-word;
     overflow-wrap: break-word;
+    max-width: 80%;
 
     /* color: #000; */
 }

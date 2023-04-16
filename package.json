@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "devc": "concurrently 'next dev' 'ts-node --esm src/worker/index.ts'",
-    "genTypes": "npx supabase gen types typescript --project-id fuutcwpbkihfauntyjvk | tee lib/database.types.ts src/worker/lib/database.types.ts",
+    "genTypes": "npx supabase gen types typescript --project-id fuutcwpbkihfauntyjvk | tee lib/database.types.ts worker/lib/database.types.ts",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"

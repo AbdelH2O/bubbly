@@ -74,6 +74,7 @@ function app(window) {
         for (var i = 0; i < queue.length; i++) {
             if (queue[i][0].toLowerCase() == 'init') {
                 bubble = queue[i][1].bubble_id;
+                messages[0].content = queue[i][1].message;
             }
             else
                 apiHandler(queue[i][0], queue[i][1]);

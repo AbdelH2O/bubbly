@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 var copyWebpackPlugin = require('copy-webpack-plugin');
 const bundleOutputDir = './dist';
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = (env) => {
     const isDevBuild = !(env && env.prod);
@@ -13,15 +14,19 @@ module.exports = (env) => {
             path: path.resolve(bundleOutputDir),
         },
         devServer: {
-            contentBase: bundleOutputDir
+            static: path.resolve(__dirname, bundleOutputDir),
         },
         plugins: isDevBuild
-            ? [new webpack.SourceMapDevToolPlugin(), new copyWebpackPlugin([{ from: 'dummy/' }])]
-            : [new webpack.optimize.UglifyJsPlugin()],
+            ? [new webpack.SourceMapDevToolPlugin(), new copyWebpackPlugin({ patterns: ['dummy/'] })]
+            : [],
+        optimization: {
+            minimizer: [new UglifyJsPlugin()],
+        },
+        mode: isDevBuild ? 'development' : 'production',
         module: {
             rules: [
                 { test: /\.html$/i, use: 'html-loader' },
-                { test: /\.css$/i, use: ['style-loader', 'css-loader' + (isDevBuild ? '' : '?minimize')] },
+                { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
                 {
                     test: /\.js$/i, exclude: /node_modules/, use: {
                         loader: 'babel-loader',

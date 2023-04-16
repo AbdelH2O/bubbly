@@ -69,6 +69,26 @@ export const resourceRouter = createTRPCRouter({
             data: z.string(),
         }))
         .mutation(async ({ input, ctx }) => {
+            const numberOfEntities = await ctx.prisma.info_entity.count({
+                where: {
+                    bubble_info_entity_bubbleTobubble: {
+                        owner: ctx.session.user.id
+                    },
+                },
+            });
+            
+            const maxx = await ctx.prisma.public_users.findUnique({
+                where: {
+                    id: ctx.session.user.id,
+                }
+            });
+            // maxx.
+            if (numberOfEntities >= (maxx?.max_entities || 0)) {
+                return {
+                    message: "max_entities",
+                    data: null,
+                };
+            }
             const entity = await ctx.prisma.info_entity.create({
                 data: {
                     bubble: input.bubble,
@@ -112,12 +132,46 @@ export const resourceRouter = createTRPCRouter({
             },
         });
         console.log(bubble);
+
+        // count sum of tokens across processed documents plus current usage of the owner and compare it to max_usage
+        // if it's over, return error
+        // if it's under, continue
+
+        
         
         if(!bubble || input.messages.length === 0) {
             console.log("no messages");
             
             return {
                 message: "failed",
+                data: null,
+            };
+        }
+        const usage = await ctx.prisma.info_entity.aggregate({
+            where: {
+                processed: 2,
+                bubble_info_entity_bubbleTobubble: {
+                    owner: bubble.owner,
+                }
+            },
+            _sum: {
+                tokens: true,
+            },
+        });
+        console.log(usage);
+        const previousUsage = await ctx.prisma.public_users.findUnique({
+            where: {
+                id: bubble.owner ? bubble.owner : "",
+            },
+            select: {
+                usage: true,
+            },
+        });
+        console.log(previousUsage);
+        if(Number(usage._sum.tokens) + input.messages[input.messages.length - 1]!.content.length/4 + (Number(previousUsage?.usage) || 0)) {
+            console.log("over usage");
+            return {
+                message: "over_usage",
                 data: null,
             };
         }
@@ -151,20 +205,27 @@ export const resourceRouter = createTRPCRouter({
             documents = [];
         }
         try {
-
+            const content = `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
+            You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
+            Your name is ${bubble.name} and your description is ${bubble.description}.
+            If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
+            If the question is not related to the context or description, politely respond that you are tuned to only answer questions that are related to the context.
+            Answer in Markdown.
+            Use the following context without explicitly mentioning it:
+            ${documents.map((doc) => doc.content).join("\n")}`;
+            if(Number(usage._sum.tokens) + content.length/4 + (Number(previousUsage?.usage) || 0)) {
+                console.log("over usage");
+                return {
+                    message: "over_usage",
+                    data: null,
+                };
+            }
             const resp = await aiClient.createChatCompletion({
                 model: 'gpt-3.5-turbo',
                 messages: [
                     {
                         role: ChatCompletionRequestMessageRoleEnum.System,
-                        content: `You are an AI assistant providing helpful advice. You are given the following extracted parts of a long document and a question. Provide a conversational answer based on the context provided.
-                        You should only provide hyperlinks that reference the context below. Do NOT make up hyperlinks.
-                        Your name is ${bubble.name} and your description is ${bubble.description}.
-                        If you can't find the answer in the context below, just say "Hmm, I'm not sure." Don't try to make up an answer.
-                        If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
-                        Answer in Markdown.
-                        Use the following context without explicitly mentioning it:
-                        ${documents.map((doc) => doc.content).join("\n")}`,
+                        content,
                     },
                     ...input.messages,
                 ],

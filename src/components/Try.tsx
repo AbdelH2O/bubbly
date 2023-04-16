@@ -13,7 +13,7 @@ const poppins = Poppins({
 });
 const lato = Lato({ subsets: ["latin"], weight: ["400", "700", "900"] });
 
-const Try = ({ name, bubble }: { name: string, bubble: string }) => {
+const Try = ({ name, bubble, greet }: { name: string, bubble: string, greet: string }) => {
     const [messages, setMessages] = useState<{
         id: number;
         content: string;
@@ -22,7 +22,7 @@ const Try = ({ name, bubble }: { name: string, bubble: string }) => {
     }[]>([
         {
             id: 1,
-            content: "Hello, how can I help you?",
+            content: greet,
             role: "assistant",
             timestamp: new Date().toLocaleTimeString(),
         }
@@ -54,6 +54,9 @@ const Try = ({ name, bubble }: { name: string, bubble: string }) => {
                 ],
                 bubble_id: bubble,
             });
+            if(resp.message === "over_usage") {
+                toast.error("You've reached the maximum usage limit for this bubble");
+            }
             if(resp.message === "failed") {
                 toast.error("Something went wrong");
             } else {

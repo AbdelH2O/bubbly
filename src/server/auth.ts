@@ -65,6 +65,7 @@ export const authOptions: NextAuthOptions = {
         }
         session.supabaseAccessToken = jwt.sign(payload, signingSecret)
       }
+      session.user.id = user.id;      
       return session
     },
   },

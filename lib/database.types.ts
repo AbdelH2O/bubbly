@@ -13,6 +13,7 @@ export interface Database {
         Row: {
           created_at: string
           description: string
+          greet_message: string
           id: string
           name: string
           owner: string | null
@@ -20,6 +21,7 @@ export interface Database {
         Insert: {
           created_at?: string
           description: string
+          greet_message?: string
           id?: string
           name: string
           owner?: string | null
@@ -27,6 +29,7 @@ export interface Database {
         Update: {
           created_at?: string
           description?: string
+          greet_message?: string
           id?: string
           name?: string
           owner?: string | null
@@ -36,21 +39,21 @@ export interface Database {
         Row: {
           bubble: string
           content: string
-          embedding: unknown
+          embedding: string
           entity: string
           id: number
         }
         Insert: {
           bubble: string
           content: string
-          embedding: unknown
+          embedding: string
           entity: string
           id?: number
         }
         Update: {
           bubble?: string
           content?: string
-          embedding?: unknown
+          embedding?: string
           entity?: string
           id?: number
         }
@@ -92,19 +95,28 @@ export interface Database {
           email: string | null
           id: string
           image: string | null
+          max_entities: number
+          max_usage: number
           name: string | null
+          usage: number
         }
         Insert: {
           email?: string | null
           id: string
           image?: string | null
+          max_entities?: number
+          max_usage?: number
           name?: string | null
+          usage?: number
         }
         Update: {
           email?: string | null
           id?: string
           image?: string | null
+          max_entities?: number
+          max_usage?: number
           name?: string | null
+          usage?: number
         }
       }
     }
@@ -120,7 +132,7 @@ export interface Database {
       }
       match_docs: {
         Args: {
-          query_embedding: unknown
+          query_embedding: string
           similarity_threshold: number
           match_count: number
           bubble_id: string
@@ -134,7 +146,7 @@ export interface Database {
       match_documents:
         | {
             Args: {
-              query_embedding: unknown
+              query_embedding: string
               similarity_threshold: number
               match_count: number
             }
@@ -146,7 +158,7 @@ export interface Database {
           }
         | {
             Args: {
-              query_embedding: unknown
+              query_embedding: string
               similarity_threshold: number
               match_count: number
               bubble_id: string
@@ -161,29 +173,29 @@ export interface Database {
         Args: {
           "": number[]
         }
-        Returns: unknown
+        Returns: string
       }
       vector_dims: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: number
       }
       vector_norm: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: number
       }
       vector_out: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: unknown
       }
       vector_send: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: string
       }

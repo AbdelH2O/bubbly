@@ -1,18 +1,22 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>Demo page of the widget</title>
     <!-- load file from https://cdn.jsdelivr.net/npm/bbly-bubble@latest/dist/widget.js -->
-    <script src="https://cdn.jsdelivr.net/npm/bbly-bubble@latest/dist/widget.js"></script>
-    <script>
+    
+    <!-- <script id="mw" async type="text/javascript" src="https://cdn.jsdelivr.net/npm/bbly-bubble@latest/dist/widget.js"></script> -->
+    <script type="text/javascript">
         (function (w,d,s,o,f,js,fjs) {
             w['MyWidget']=o;w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
             js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
             js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
+        // }(window, document, 'script', 'mw', 'https://cdn.jsdelivr.net/npm/bbly-bubble@1.0.1/dist/widget.js'));
         }(window, document, 'script', 'mw', './widget.js'));
-        mw('init', { bubble_id: '' });
+        mw('init', { bubble_id: 'efef106b-715d-409c-a195-98deb73c6a0d', message: 'Hello how can I help you?' });
     </script>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
 </head>
-<body>
+<body style="height: 400vh;">
     <h1>Lorem ipsum dolor sit amet augue</h1>
     <h2>Fusce gravida vehicula vestibulum tortor pulvinar</h2>
     <p>Orci purus ante excepteur nunc nascetur rhoncus taciti ut. Ornare vitae sed. Amet suspendisse integer rutrum aliquet
