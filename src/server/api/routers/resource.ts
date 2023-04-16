@@ -39,17 +39,55 @@ export const resourceRouter = createTRPCRouter({
         .input(z.object({ entity: z.string(), type: z.string() }))
         .mutation(async ({ input, ctx }) => {
             // eslint-disable-next-line
+            const usage = await ctx.prisma.public_users.findUnique({
+                where: {
+                    id: ctx.session.user.id,
+                },
+            });
+            const entity = await ctx.prisma.info_entity.findUnique({
+                where: {
+                    id: input.entity,
+                },
+            });
+            if (!entity) {
+                return {
+                    message: "entity_not_found",
+                };
+            }
+            if (entity.processed === 1) {
+                return {
+                    message: "already_processed",
+                };
+            }
+            if( Number(usage?.usage) + Number(entity.tokens) > Number(usage?.max_usage)) {
+                return {
+                    message: "usage_limit_exceeded",
+                };
+            }
+
             const response = await processQueue.add({
                 id: input.entity,
                 type: "embed",
             });
             // console.log(response);
+
+                
             const change = await ctx.prisma.info_entity.update({
                 where: {
                     id: input.entity,
                 },
                 data: {
                     processed: 1,
+                },
+            });
+            await ctx.prisma.public_users.update({
+                where: {
+                    id: ctx.session.user.id,
+                },
+                data: {
+                    usage: {
+                        increment: Number(entity.tokens),
+                    },
                 },
             });
             if (response && change.processed === 1) {
@@ -175,6 +213,14 @@ export const resourceRouter = createTRPCRouter({
                 data: null,
             };
         }
+        await ctx.prisma.public_users.update({
+            where: {
+                id: bubble.owner ? bubble.owner : "",
+            },
+            data: {
+                usage: Number(usage._sum.tokens) + input.messages[input.messages.length - 1]!.content.length/4 + (Number(previousUsage?.usage) || 0),
+            },
+        });
         const embeddingResponse = await aiClient.createEmbedding({
             model: 'text-embedding-ada-002',
             input: input.messages[input.messages.length - 1]!.content,
@@ -244,6 +290,16 @@ export const resourceRouter = createTRPCRouter({
             }
             const message = resp.data.choices[0]!.message;
             console.log(message);
+            await ctx.prisma.public_users.update({
+                where: {
+                    id: bubble.owner ? bubble.owner : "",
+                },
+                data: {
+                    usage: {
+                        increment: content.length/4,
+                    },
+                },
+            });
             
             return {
                 message: "success",
