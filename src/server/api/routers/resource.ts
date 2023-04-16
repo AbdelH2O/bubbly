@@ -192,6 +192,7 @@ export const resourceRouter = createTRPCRouter({
         // console.log(bubble.id, embedding);
         
         const { data: docs, error } = await uSBClient.rpc('match_documents', {
+            // @ts-ignore
             query_embedding: embedding,
             similarity_threshold: 0.7, // Choose an appropriate threshold for your data
             match_count: 5, // Choose the number of matches
