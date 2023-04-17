@@ -274,7 +274,7 @@ const BubblePage = () => {
             if (error) {
                 toast.error(error.message);
             }
-            if (data) {
+            else {
                 toast.success("Info deleted successfully");
                 setBubble({
                     ...bubble,
