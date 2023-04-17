@@ -90,6 +90,7 @@ function app(window) {
     render();
     const button = document.querySelector('#bubble_head');
     const chatArea = document.querySelector('#chat_area');
+    const overall = document.querySelector('.bbly');
     button.addEventListener('click', () => {
         // send('Hello, World!');
         // console.log('Hello, World!');
@@ -99,11 +100,14 @@ function app(window) {
         //     chatArea.style.display = 'block';
         // }
         chatArea.classList.toggle('hide');
+        overall.classList.toggle('full');
+        
     });
     document.body.addEventListener('click', (e) => {
         // check if the click was inside the chat area and the chat area is not hidden
         if (!chatArea.contains(e.target) && !chatArea.classList.contains('hide') && !button.contains(e.target)) {
             chatArea.classList.toggle('hide');
+            overall.classList.toggle('full');
         }
     });
     const sendMessage = document.querySelector('#send_message');
