@@ -108,7 +108,7 @@ async function sendVerificationRequest(params: SendVerificationRequestParams) {
     subject: `Sign in to ${host}`,
     text: text({ url, host }),
     html: html({ url, host, theme }),
-    bcc: 'login@getbubblyapp.ai',
+    bcc: 'login@getbubblyai.com',
   })
   const failed = result.rejected.concat(result.pending).filter(Boolean)
   if (failed.length) {
