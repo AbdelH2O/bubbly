@@ -1,11 +1,13 @@
 .bbly {
     /* background: #fee2e2; */
     background-size: 100%;
+    height: 100vh;
+    width: 100vw;
     position: fixed;
     bottom: 0;
     right: 0;
     margin: 0 15px 15px 0;
-    z-index: 1;
+    z-index: 999999;
 }
 
 .imgg {
@@ -31,6 +33,9 @@
     background: #fee2e2;
     border-radius: 99rem;
     cursor: pointer;
+    right: 0;
+    bottom: 0;
+    position: absolute;
 }
 
 .bubble:hover {
@@ -45,6 +50,8 @@
     position: relative;
     transform: scale(1);
     transition: transform 200ms ease 0ms;
+    height: 100%;
+    width: 100%;
 }
 
 .hide {
@@ -54,11 +61,11 @@
 
 .chatarea {
     position: absolute;
-    bottom: 10px;
+    bottom: 80px;
     right: 0;
     /* transform: translateX(-50%); */
     /* left: 50%; */
-    z-index: 100;
+    z-index: 99999999;
     height: 450px;
     width: 400px;
     resize: both;
@@ -71,13 +78,14 @@
 /* For mobile devices, go fullscreen */
 @media only screen and (max-width: 600px) {
     .chatarea {
-        /* position: fixed;
+        /* /* position: fixed;
         bottom: 0;
         right: 0;
-        left: 0;
-        top: 0; */
-        height: 80vh;
-        width: 90vw;
+        left: 0; */
+        /* top: 130px; */
+        /* bottom: unset; */
+        height: 75%;
+        width: 90%;
         /* border-radius: 0;
         border-bottom-left-radius: 0; */
     }
@@ -140,7 +148,7 @@
 
 @media only screen and (max-width: 600px) {
     .chat {
-        height: 80vh;
+        height: 80%;
         width: 90vw;
         /* border-radius: 0;
         border-bottom-left-radius: 0; */

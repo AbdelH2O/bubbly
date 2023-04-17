@@ -167,7 +167,8 @@ function send(text) {
             0: {
                 json: {
                     bubble_id: bubble,
-                    messages
+                    // remove the loading message
+                    messages: messages.slice(0, -1),
                 }
             }
         }),
