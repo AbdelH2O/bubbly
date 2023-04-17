@@ -46,6 +46,7 @@
     "@types/eslint": "^8.21.3",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "^18.15.5",
+    "@types/nodemailer": "^6.4.7",
     "@types/nprogress": "^0.2.0",
     "@types/prettier": "^2.7.2",
     "@types/react": "^18.0.28",
