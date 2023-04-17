@@ -262,7 +262,7 @@ export const resourceRouter = createTRPCRouter({
             Answer in Markdown.
             Use the following context without explicitly mentioning it:
             ${documents.map((doc) => doc.content).join("\n")}`;
-            if(Number(usage._sum.tokens) + content.length/4 + (Number(previousUsage?.usage) || 0)) {
+            if(Number(usage._sum.tokens) + content.length/4 + (Number(previousUsage?.usage) || 0) > Number(previousUsage?.max_usage)) {
                 console.log("over usage");
                 return {
                     message: "over_usage",
