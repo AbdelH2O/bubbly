@@ -934,7 +934,7 @@ const snippet = (bubble: string, message: string) => {
             w['MyWidget']=o;w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
             js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
             js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
-        }(window, document, 'script', 'mw', 'https://cdn.jsdelivr.net/npm/bbly-bubble@1.0.3/dist/widget.js'));
+        }(window, document, 'script', 'mw', 'https://cdn.jsdelivr.net/npm/bbly-bubble@latest/dist/widget.js'));
         mw('init', { bubble_id: '${bubble}', message: '${message}' });
     </script>
     `;
