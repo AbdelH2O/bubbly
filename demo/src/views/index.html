@@ -1,7 +1,7 @@
 <style rel="./index.css"></style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <div class="bbly">
     <div class="pos hide" id="chat_area">
         <div class="chatarea">
@@ -27,86 +27,62 @@
             </div> -->
             <div class="chat">
                 <div class="chatbox">
-                    <div class="chatbox__body" id="chatbox__body">
-                        <div
-                            class="chatbox__body__message chatbox__body__message--left"
-                        >
-                            <div class="chatbox__body__message__img">
-                                <img
-                                    src="https://avatars.dicebear.com/api/micah/4.svg"
-                                    id="img"
-                                    height="40px"
-                                    width="40px"
-                                />
-                            </div>
-                            <div class="chatbox__body__message__text left">
-                                <p>Hi, I'm Steve. How can I help you?</p>
-                            </div>
+                    <div class="chatbox__header">
+                        <div class="btn__chatbox__close">
+
+                            <svg id="btnChatboxClose" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M9.5 1.5C9.77614 1.22386 9.77614 0.776142 9.5 0.5C9.22386 0.223858 8.77614 0.223858 8.5 0.5L5 4L1.5 0.5C1.22386 0.223857 0.776142 0.223858 0.5 0.5C0.223858 0.776142 0.223858 1.22386 0.5 1.5L4 5L0.499999 8.5C0.223857 8.77614 0.223858 9.22386 0.5 9.5C0.776142 9.77614 1.22386 9.77614 1.5 9.5L5 6L8.5 9.5C8.77614 9.77614 9.22386 9.77614 9.5 9.5C9.77614 9.22386 9.77614 8.77614 9.5 8.5L6 5L9.5 1.5Z" fill="#595959"/>
+                            </svg>
                         </div>
-                        <div
-                            class="chatbox__body__message chatbox__body__message--right"
-                        >
-                            <div class="chatbox__body__message__text right">
-                                <p>What's your purpose?</p>
+                    </div>
+                    <div class="chatbox__body__wrapper">
+                        <div class="chatbox__body" id="chatbox__body">
+                            <div
+                                class="chatbox__body__message chatbox__body__message--left"
+                            >
+                                
+                                <div class="chatbox__body__message__text left">
+                                    <span>Hi, I'm Steve. How can I help you?</span>
+                                </div>
+                            </div>
+                            <div
+                                class="chatbox__body__message chatbox__body__message--right"
+                            >
+                                <div class="chatbox__body__message__text right">
+                                    <span>What's your purpose?</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="bottom">
+                    </div>
+                    <div class="bottom">
                 <div class="bottom__left">
+                    <div class="input__wrapper">
                     <input
                         type="text"
                         id="message"
                         placeholder="Type a message..."
                         class="input"
                     />
-                </div>
-                <div class="bottom__right">
-                    <button class="btn" id="send_message">
-                        <svg fill="#fee2e2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="paper-plane" height="20px" width="20px">
-                            <path
-                                d="M20.34,9.32l-14-7a3,3,0,0,0-4.08,3.9l2.4,5.37h0a1.06,1.06,0,0,1,0,.82l-2.4,5.37A3,3,0,0,0,5,22a3.14,3.14,0,0,0,1.35-.32l14-7a3,3,0,0,0,0-5.36Zm-.89,3.57-14,7a1,1,0,0,1-1.35-1.3l2.39-5.37A2,2,0,0,0,6.57,13h6.89a1,1,0,0,0,0-2H6.57a2,2,0,0,0-.08-.22L4.1,5.41a1,1,0,0,1,1.35-1.3l14,7a1,1,0,0,1,0,1.78Z">
-                            </path>
+                    <button class="btn btn__send" disabled id="send_message">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.20492 11.1919C0.205375 11.5634 0.596395 11.8047 0.928612 11.6385L11.3063 6.44717C11.6747 6.26288 11.6747 5.73712 11.3063 5.55283L0.928612 0.361524C0.596395 0.195336 0.205375 0.436617 0.20492 0.808082L0.20072 4.2379C0.200418 4.4846 0.380097 4.69465 0.623866 4.73257L8.77162 6L0.623867 7.26743C0.380097 7.30535 0.200418 7.5154 0.20072 7.7621L0.20492 11.1919Z" fill="#014DFE"/>
                         </svg>
                     </button>
+                    </div>
                 </div>
-            </div>
-            <!-- Powered by bbly text that redirects to http://getbubblyai.com/ -->
-            <a class="powered" href="http://getbubblyai.com/" target="_blank">
+                <a class="powered" href="http://getbubblyai.com/" target="_blank">
                 <span>
-                    Powered by Bubbly
+                    Powered by <b>Bubbly</b>
                 </span>
             </a>
-            <style>
-                .powered {
-                    position: absolute;
-                    /* bottom: 0; */
-                    left: 0;
-                    text-align: center;
-                    padding: 10px;
-                    font-size: 12px;
-                    color: #fee2e2;
-                    background-color: #b91c1c;
-                    border-radius: 0 0 10px 10px;
-                    text-decoration: none;
-                }
-                .powered span {
-                    color: #fee2e2;
-                    text-decoration: none;
-                    font-family: 'Poppins', sans-serif;
-                }
-                .powered span:hover {
-                    filter: brightness(1.2);
-                }
-            </style>
+            </div>
+            </div>
         </div>
     </div>
     <div class="bubble" id="bubble_head">
-        <img
-            class="imgg"
-            src="./logo12.png"
-            id="img"
-        />
+        <svg width="26" height="40" viewBox="0 0 26 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.256 0.0120239C17 0.0120239 20.006 1.03802 22.274 3.09003C24.578 5.10603 25.73 7.89603 25.73 11.46C25.73 14.988 24.596 17.688 22.328 19.56C20.06 21.396 17.054 22.314 13.31 22.314L13.094 26.472H6.45199L6.18199 17.292H8.61199C11.744 17.292 14.156 16.878 15.848 16.05C17.54 15.222 18.386 13.71 18.386 11.514C18.386 9.93003 17.918 8.67002 16.982 7.73402C16.082 6.79803 14.84 6.33003 13.256 6.33003C11.6 6.33003 10.304 6.78003 9.36799 7.68003C8.46799 8.58003 8.01799 9.82203 8.01799 11.406H0.88999C0.85399 9.21003 1.32199 7.24803 2.29399 5.52003C3.26599 3.79203 4.68799 2.44202 6.55999 1.47002C8.46799 0.498024 10.7 0.0120239 13.256 0.0120239ZM9.74599 39.378C8.37799 39.378 7.24399 38.964 6.34399 38.136C5.47999 37.272 5.04799 36.21 5.04799 34.95C5.04799 33.69 5.47999 32.646 6.34399 31.818C7.24399 30.954 8.37799 30.522 9.74599 30.522C11.078 30.522 12.176 30.954 13.04 31.818C13.904 32.646 14.336 33.69 14.336 34.95C14.336 36.21 13.904 37.272 13.04 38.136C12.176 38.964 11.078 39.378 9.74599 39.378Z" fill="white"/>
+        </svg>
     </div>
 </div>

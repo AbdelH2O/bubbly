@@ -28,21 +28,22 @@ function render() {
         // el
         el.classList.add('chatbox__body__message');
         el.classList.add(message.role === 'assistant' ? 'chatbox__body__message--left' : 'chatbox__body__message--right');
-        el.innerHTML = `
-            ${
-                message.role === 'assistant' ?
-                `<div class="chatbox__body__message__img">
-                    <img
-                        src="https://avatars.dicebear.com/api/micah/4.svg"
-                        id="img"
-                        height="40px"
-                        width="40px"
-                    />
-                </div>` :
-                ''
-            }
-            <div class="chatbox__body__message__text ${message.role === 'assistant'? 'left': 'right'}">
-                <p ${message.content === 'Loading' ? 'id="loader"' : ''}>${message.content}</p>
+        el.innerHTML = 
+        // `
+        //     ${
+        //         message.role === 'assistant' ?
+        //         `<div class="chatbox__body__message__img">
+        //             <img
+        //                 src="https://avatars.dicebear.com/api/micah/4.svg"
+        //                 id="img"
+        //                 height="40px"
+        //                 width="40px"
+        //             />
+        //         </div>` :
+        //         ''
+        //     }`
+            `<div class="chatbox__body__message__text ${message.role === 'assistant'? 'left': 'right'}">
+                <span ${message.content === 'Loading' ? 'id="loader"' : ''}>${message.content}</span>
             </div>
         `;
         // if the message is the loading message, add a loading animation (three dots) where the dots are added every 500ms until the message is replaced with the actual response
@@ -91,6 +92,7 @@ function app(window) {
     const button = document.querySelector('#bubble_head');
     const chatArea = document.querySelector('#chat_area');
     const overall = document.querySelector('.bbly');
+    const btnChatboxClose = document.querySelector('#btnChatboxClose');
     button.addEventListener('click', () => {
         // send('Hello, World!');
         // console.log('Hello, World!');
@@ -100,14 +102,18 @@ function app(window) {
         //     chatArea.style.display = 'block';
         // }
         chatArea.classList.toggle('hide');
-        overall.classList.toggle('full');
+        overall.classList.toggle('sm-full');
         
+    });
+    btnChatboxClose.addEventListener("click", () => {
+      chatArea.classList.toggle("hide");
+      overall.classList.toggle("sm-full");
     });
     document.body.addEventListener('click', (e) => {
         // check if the click was inside the chat area and the chat area is not hidden
         if (!chatArea.contains(e.target) && !chatArea.classList.contains('hide') && !button.contains(e.target)) {
             chatArea.classList.toggle('hide');
-            overall.classList.toggle('full');
+            overall.classList.toggle('sm-full');
         }
     });
     const sendMessage = document.querySelector('#send_message');
@@ -118,10 +124,20 @@ function app(window) {
     });
     // listen for enter key press to send message and clear input while the chat area is not hidden
     document.querySelector('#message').addEventListener('keyup', (e) => {
+        
+        // change send button icon on text input
+        if(e.target.value && e.target.value != ''){
+            document.querySelector('#send_message').disabled = false
+        }else{
+            document.querySelector("#send_message").disabled = true;
+        }
         if (e.key === 'Enter' && !chatArea.classList.contains('hide')) {
             const text = document.querySelector('#message').value;
             send(text);
             document.querySelector('#message').value = '';
+           const bodyWrapper =  document.querySelector(".chatbox__body__wrapper")
+            bodyWrapper.scrollTop = bodyWrapper.scrollHeight;
+
         }
     });
     // console.log('Hello, World!');
