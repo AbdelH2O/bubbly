@@ -63,6 +63,10 @@ function render() {
     chatArea.scrollTop = chatArea.scrollHeight;
 }
 
+const scrolltoBottom = function() {
+    const bodyWrapper =  document.querySelector(".chatbox__body__wrapper")
+    bodyWrapper.scrollTop = bodyWrapper.scrollHeight;
+}
 
 let id = 1;
 
@@ -121,6 +125,7 @@ function app(window) {
         const text = document.querySelector('#message').value;
         send(text);
         document.querySelector('#message').value = '';
+        scrolltoBottom()
     });
     // listen for enter key press to send message and clear input while the chat area is not hidden
     document.querySelector('#message').addEventListener('keyup', (e) => {
@@ -135,9 +140,7 @@ function app(window) {
             const text = document.querySelector('#message').value;
             send(text);
             document.querySelector('#message').value = '';
-           const bodyWrapper =  document.querySelector(".chatbox__body__wrapper")
-            bodyWrapper.scrollTop = bodyWrapper.scrollHeight;
-
+            scrolltoBottom()
         }
     });
     // console.log('Hello, World!');
@@ -208,6 +211,7 @@ function send(text) {
         
         // clear the loading animation
         clearInterval(interval);
+        scrolltoBottom()
     }).catch((error) => {
         console.error(error);
     });
