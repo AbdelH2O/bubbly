@@ -25,7 +25,7 @@ export default function handler(
 ) {
   // We can use the response object to enable CORS
   // console.log(req.url);
-  if(req.url?.includes('api/trpc/entity.sendMessage')) {
+  if(req.url?.includes('api/trpc/entity.sendMessage') || req.url?.includes('api/trpc/entity.raiseTicket')) {
     
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Request-Method', '*');
