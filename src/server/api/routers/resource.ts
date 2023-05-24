@@ -223,6 +223,29 @@ export const resourceRouter = createTRPCRouter({
                 usage: Math.floor(Number(usage._sum.tokens) + input.messages[input.messages.length - 1]!.content.length/4 + (Number(previousUsage?.usage) || 0)),
             },
         });
+        if(input.fingerprint){
+            let chat = await ctx.prisma.chat.findUnique({
+                where: {
+                    fingerprint: input.fingerprint || "",
+                },
+            });
+            if(!chat) {
+                chat = await ctx.prisma.chat.create({
+                    data: {
+                        fingerprint: input.fingerprint,
+                        bubble: bubble.id,
+                    },
+                });
+            }
+            await ctx.prisma.message.create({
+                data: {
+                    chat: chat.fingerprint,
+                    content: input.messages[input.messages.length - 1]!.content,
+                    sender: input.messages[input.messages.length - 1]!.role,
+                },
+            })
+        }
+
         const embeddingResponse = await aiClient.createEmbedding({
             model: 'text-embedding-ada-002',
             input: input.messages[input.messages.length - 1]!.content,
@@ -302,6 +325,15 @@ export const resourceRouter = createTRPCRouter({
                     },
                 },
             });
+            if(input.fingerprint && message){
+                await ctx.prisma.message.create({
+                    data: {
+                        chat: input.fingerprint,
+                        content: message.content,
+                        sender: ChatCompletionRequestMessageRoleEnum.System,
+                    },
+                })
+            }
             
             return {
                 message: "success",
