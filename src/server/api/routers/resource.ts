@@ -162,6 +162,7 @@ export const resourceRouter = createTRPCRouter({
                 content: z.string(),
             })).min(1),
             bubble_id: z.string(),
+            fingerprint: z.string().optional(),
         })
     ).mutation(async ({ input, ctx }) => {
         const bubble = await ctx.prisma.bubble.findUnique({
@@ -333,4 +334,36 @@ export const resourceRouter = createTRPCRouter({
         //     model
         // })
     }),
+
+    raiseTicket: publicProcedure.input(z.object({
+        bubble_id: z.string(),
+        message: z.string(),
+        email: z.string().email(),
+    })).mutation(async ({ input, ctx }) => {
+        const bubble = await ctx.prisma.bubble.findUnique({
+            where: {
+                id: input.bubble_id,
+            },
+        });
+        if(!bubble) {
+            return {
+                message: "failed",
+                data: null,
+            };
+        }
+        const ticket = await ctx.prisma.ticket.create({
+            data: {
+                bubble: bubble.id,
+                message: input.message,
+                email: input.email,
+            },
+        });
+        return {
+            message: "success",
+            data: {
+                ticket,
+            },
+        };
+    }),
+
 });
