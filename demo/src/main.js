@@ -19,6 +19,7 @@ messages.push = function() {
 let interval;
 
 let bubble = '';
+let fingerprint = '';
 
 function render() {
     const chatArea = document.querySelector('#chatbox__body');
@@ -70,8 +71,8 @@ const scrolltoBottom = function() {
 
 let id = 1;
 
-const url = 'https://bbly.vercel.app/api/trpc/entity.sendMessage?batch=1';
-
+const url = 'https://app.getbubblyai.com/api/trpc/entity.sendMessage?batch=1';
+const ticketUrl = 'https://app.getbubblyai.com/api/trpc/entity.raiseTicket?batch=1';
 function app(window) {
     let globalObject = window[window['MyWidget']];
     let queue = globalObject.q;
@@ -144,6 +145,59 @@ function app(window) {
         }
     });
     // console.log('Hello, World!');
+    const raiseTicketButton = document.querySelector('.raiseTicket');
+    const modal = document.querySelector('#modal');
+    const modalContent = document.querySelector('.modal-content');
+    const closeButton = document.querySelector('.close');
+
+    modal.addEventListener('click', (e) => {
+        if (!modalContent.contains(e.target)) {
+            modal.style.display = 'none';
+            console.log('clicked');
+        }
+    });
+
+    raiseTicketButton.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        chatArea.classList.toggle("hide");
+    });
+    
+    closeButton.addEventListener('click', () => {
+        modal.style.display = 'none';
+        chatArea.classList.toggle("hide");
+    });
+
+    const submitButton = document.querySelector('#submitTicket');
+    submitButton.addEventListener('click', () => {
+        const email = document.querySelector('#email').value;
+        const message = document.querySelector('#msg').value;
+        const data = {
+            bubble_id: bubble,
+            email,
+            message,
+        };
+        console.log(data);
+        fetch(ticketUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                0: {
+                    json: data,
+                },
+            }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data);
+                modal.style.display = 'none';
+                chatArea.classList.toggle("hide");
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
 }
 
 function send(text) {
@@ -192,6 +246,7 @@ function send(text) {
                     bubble_id: bubble,
                     // remove the loading message
                     messages: messages.slice(0, -1),
+                    fingerprint: fingerprint,
                 }
             }
         }),
@@ -235,11 +290,12 @@ function apiHandler(api, params) {
     }
 }
 
-// function extendObject(a, b) {
-//     for (var key in b)
-//         if (b.hasOwnProperty(key))
-//             a[key] = b[key];
-//     return a;
-// }
-
+const fpPromise = import('@fingerprintjs/fingerprintjs')
+    .then(FingerprintJS => FingerprintJS.load());
+fpPromise.then(fp => {
+    fp.get().then(result => {
+        console.log(result.visitorId);
+        fingerprint = result.visitorId;
+    });
+});
 app(window);
