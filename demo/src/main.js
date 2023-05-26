@@ -175,6 +175,7 @@ function app(window) {
             bubble_id: bubble,
             email,
             message,
+            fingerprint
         };
         console.log(data);
         fetch(ticketUrl, {
