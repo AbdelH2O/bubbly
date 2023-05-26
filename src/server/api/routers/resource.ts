@@ -372,6 +372,7 @@ export const resourceRouter = createTRPCRouter({
         bubble_id: z.string(),
         message: z.string(),
         email: z.string().email(),
+        fingerprint: z.string().optional(),
     })).mutation(async ({ input, ctx }) => {
         const bubble = await ctx.prisma.bubble.findUnique({
             where: {
@@ -389,12 +390,14 @@ export const resourceRouter = createTRPCRouter({
                 bubble: bubble.id,
                 message: input.message,
                 email: input.email,
+                chat: input.fingerprint,
             },
         });
         const t: Ticket = {
             ...ticket,
             id: Number(ticket.id),
             created_at: ticket.created_at ? ticket.created_at.toISOString() : "",
+            chat: ticket.chat ? ticket.chat : "",
         }
         await sendTicketNotification(t, bubble.ticket_email ? bubble.ticket_email : "");
         return {
