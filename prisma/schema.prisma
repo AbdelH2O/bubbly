@@ -129,6 +129,7 @@ model chat {
   fingerprint                String    @id
   bubble_chat_bubbleTobubble bubble    @relation("chat_bubbleTobubble", fields: [bubble], references: [id], onDelete: Cascade, onUpdate: NoAction)
   message_message_chatTochat message[] @relation("message_chatTochat")
+  ticket_ticket_chatTochat   ticket[]  @relation("ticket_chatTochat")
 
   @@schema("public")
 }
@@ -150,7 +151,9 @@ model ticket {
   email                        String
   message                      String
   created_at                   DateTime? @default(now()) @db.Timestamptz(6)
+  chat                         String?
   bubble_ticket_bubbleTobubble bubble    @relation("ticket_bubbleTobubble", fields: [bubble], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  chat_ticket_chatTochat       chat?     @relation("ticket_chatTochat", fields: [chat], references: [fingerprint], onUpdate: NoAction)
 
   @@schema("public")
 }
