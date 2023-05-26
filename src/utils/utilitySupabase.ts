@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Database } from 'lib/database.types';
+import { type Database } from 'lib/database';
 import { env } from '~/env.mjs';
 
 const uSBClient = createClient<Database>(

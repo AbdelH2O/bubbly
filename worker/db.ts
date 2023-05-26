@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
-import { type Database } from "lib/database.types";
+import { type Database } from "lib/database";
 
 // import { env } from "./env.mjs";
 const env = { NODE_ENV: "development" };
