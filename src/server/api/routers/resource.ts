@@ -10,6 +10,7 @@ import processQueue from "~/utils/redisClient";
 import aiClient from "~/utils/openAIclient";
 import uSBClient from "~/utils/utilitySupabase";
 import { ChatCompletionRequestMessageRoleEnum } from "openai/dist/api";
+import sendTicketNotification from "~/utils/mailer";
 
 // const CONDENSE_PROMPT = (history: string[], question: string) => {
 //     return `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
@@ -390,6 +391,12 @@ export const resourceRouter = createTRPCRouter({
                 email: input.email,
             },
         });
+        const t: Ticket = {
+            ...ticket,
+            id: Number(ticket.id),
+            created_at: ticket.created_at ? ticket.created_at.toISOString() : "",
+        }
+        await sendTicketNotification(t, bubble.ticket_email ? bubble.ticket_email : "");
         return {
             message: "success",
             data: {
