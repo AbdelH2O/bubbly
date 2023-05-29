@@ -168,7 +168,12 @@ function app(window) {
     });
 
     const submitButton = document.querySelector('#submitTicket');
-    submitButton.addEventListener('click', () => {
+    submitButton.addEventListener('click', (e) => {
+        const btn = e.target;
+        btn.disabled = true;
+        btn.innerHTML = 'Submitting...';
+        btn.style.opacity = 0.8;
+        btn.style.cursor = 'not-allowed';
         const email = document.querySelector('#email').value;
         const message = document.querySelector('#msg').value;
         const data = {
@@ -194,6 +199,10 @@ function app(window) {
                 console.log('Success:', data);
                 modal.style.display = 'none';
                 chatArea.classList.toggle("hide");
+                btn.disabled = false;
+                btn.innerHTML = 'Submit';
+                btn.style.opacity = 1;
+                btn.style.cursor = 'pointer';
             })
             .catch((error) => {
                 console.error('Error:', error);
