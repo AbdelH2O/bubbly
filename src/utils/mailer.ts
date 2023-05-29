@@ -13,7 +13,7 @@ const sendTicketNotification = async (ticket: Ticket, email: string) => {
     const result = await transport.sendMail({
         to: email,
         from: env.SMTP_FROM,
-        subject: `New ticket from on Bubbly`,
+        subject: `New Ticket Created on Bubbly`,
         text: notificationText(ticket),
     });
     const failed = result.rejected.concat(result.pending).filter(Boolean);
