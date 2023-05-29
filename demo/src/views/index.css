@@ -281,7 +281,7 @@
 .chatbox__body__message {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.3rem;
     /* margin-bottom: 1rem; */
     /* max-width: 80%; */
     /* width: ; */
@@ -488,7 +488,7 @@
     margin-right: 10px;
     font-family: 'Montserrat', sans-serif;
     font-weight: 500;
-    font-size: 11px;
+    font-size: 9.5px;
     text-align: end;
     /* color: #979797; */
 }
