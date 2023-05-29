@@ -7,6 +7,7 @@ import {
 } from "next-auth";
 // import DiscordProvider from "next-auth/providers/discord";
 import EmailProvider, { type SendVerificationRequestParams } from "next-auth/providers/email";
+import Auth0Provider from "next-auth/providers/auth0";
 // import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import { env } from "~/env.mjs";
@@ -165,6 +166,11 @@ export const authOptions: NextAuthOptions = {
       sendVerificationRequest
       // TODO: Add custom email templates
     }),
+    Auth0Provider({
+      clientId: env.AUTH0_CLIENT_ID,
+      clientSecret: env.AUTH0_CLIENT_SECRET,
+      issuer: env.AUTH0_ISSUER
+    })
     // DiscordProvider({
     //   clientId: env.DISCORD_CLIENT_ID,
     //   clientSecret: env.DISCORD_CLIENT_SECRET,

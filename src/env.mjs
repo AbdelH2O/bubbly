@@ -26,6 +26,9 @@ const server = z.object({
   SMTP_FROM: z.string().min(1),
   EDIS_URL: z.string().url(),
   OPENAI_API_KEY: z.string().min(1),
+  AUTH0_CLIENT_ID: z.string().min(1),
+  AUTH0_CLIENT_SECRET: z.string().min(1),
+  AUTH0_ISSUER: z.string().min(1),
 });
 
 /**
@@ -58,6 +61,9 @@ const processEnv = {
   SHADOW_DATABASE_URL: process.env.SHADOW_DATABASE_URL,
   EDIS_URL: process.env.EDIS_URL,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
+  AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
+  AUTH0_ISSUER: process.env.AUTH0_ISSUER,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
