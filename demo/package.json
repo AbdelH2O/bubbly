@@ -1,6 +1,6 @@
 {
     "name": "bbly-bubble",
-    "version": "2.0.25",
+    "version": "2.0.27",
     "description": "A simple example of how to use script tag in webpack",
     "author": "@AbdelH2O",
     "main": "dist/widget.js",
