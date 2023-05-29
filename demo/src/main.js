@@ -73,7 +73,7 @@ const scrolltoBottom = function() {
 let id = 1;
 
 const url = 'https://app.getbubblyai.com/api/trpc/entity.sendMessage?batch=1';
-const ticketUrl = 'https://bubbly-git-staging-bubbly.vercel.app/api/trpc/entity.raiseTicket?batch=1';
+const ticketUrl = 'https://app.getbubblyai.com/api/trpc/entity.raiseTicket?batch=1';
 function app(window) {
     let globalObject = window[window['MyWidget']];
     let queue = globalObject.q;
