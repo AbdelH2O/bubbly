@@ -48,7 +48,7 @@ const Chats = ({
             .from("chat")
             .select("fingerprint", { count: "exact" })
             .eq("bubble", bubble_id);
-        if (countError || !count) {
+        if (countError || count === null) {
             toast.error(countError ? countError.message : "Error fetching chats");
         } else {
             setTotal(count);
@@ -82,7 +82,7 @@ const Chats = ({
                     </p>
                 </div>
             </div>
-            <div className="flex flex-col w-full h-full bg-red-100 rounded-b-lg">
+            <div className="flex flex-col w-full h-full bg-red-100 rounded-b-lg py-4">
                 <div className="flex flex-col w-full h-fit min-h-[14rem] rounded-b-lg">
                     {loading ? (
                         <div className="flex flex-col w-full h-fit justify-center items-center my-auto">
@@ -98,13 +98,21 @@ const Chats = ({
                                         }
                                         className="w-40"
                                     />
-                                    <p
+                                    <h3
                                         className={
-                                            "text-lg font-semibold leading-6 text-gray-600 " +
+                                            "text-2xl font-medium leading-6 text-black " +
                                             poppins.className
                                         }
                                     >
-                                        No chats yet...
+                                        No Chats
+                                    </h3>
+                                    <p
+                                        className={
+                                            "mt-1 max-w-2xl text-sm text-gray-800 " +
+                                            lato.className
+                                        }
+                                    >
+                                        You don&apos;t have any chats to view yet
                                     </p>
                                 </div>
                             ) : (
@@ -144,7 +152,7 @@ const Chats = ({
                                             ))}
                                             
                                         </div>
-                                        <div className="flex col-span-4 flex-col w-full h-fit justify-center items-center">
+                                        <div className="flex col-span-4 flex-col w-full h-full justify-center items-center">
                                             {selected ? (
                                                 <div className="flex flex-col w-full h-fit justify-center items-center">
                                                     <div className="flex flex-col w-full h-fit px-2">
@@ -169,34 +177,13 @@ const Chats = ({
                                                                 </div>
                                                             )}
                                                         )}
-                                                        {selected.messages && Array.isArray(selected.messages) && selected.messages.map((message, i) => {
-                                                            return (
-                                                                <div key={i} className={`flex mt-2 flex-row w-full h-fit justify-${message.sender === "user" ? "end" : "start"} items-center`}>
-                                                                    <div
-                                                                        className={
-                                                                            "flex flex-col gap-2 px-4 py-2 rounded-lg shadow-md " +
-                                                                            (message.sender === "user"
-                                                                                ? "bg-white"
-                                                                                : "bg-red-700 text-white")
-                                                                        }
-                                                                    >
-                                                                        <div className={poppins.className}>
-                                                                            {message.content}
-                                                                        </div>
-                                                                        <div className={lato.className}>
-                                                                            {new Date(message.created_at || "").toLocaleString()}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        )}
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="flex flex-col w-full h-fit justify-center items-center">
+                                                <div className="flex flex-col w-full h-full justify-center items-center">
                                                     <p
                                                         className={
-                                                            "text-2xl font-semibold leading-6 text-gray-500 " +
+                                                            "text-2xl font-semibold leading-6 text-black " +
                                                             poppins.className
                                                         }
                                                     >

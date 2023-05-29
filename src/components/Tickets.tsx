@@ -42,7 +42,7 @@ const Tickets = ({
             .from("ticket")
             .select("id", { count: "exact" })
             .eq("bubble", bubble_id);
-        if (countError || !count) {
+        if (countError || count === null) {            
             toast.error(countError ? countError.message : "Error fetching tickets");
         } else {
             setTotal(count);
@@ -76,7 +76,7 @@ const Tickets = ({
                     </p>
                 </div>
             </div>
-            <div className="flex flex-col w-full h-full bg-white rounded-b-lg">
+            <div className="flex flex-col w-full h-full bg-white rounded-b-lg py-4">
                 <div className="flex flex-col w-full h-fit min-h-[14rem] rounded-b-lg">
                     {loading ? (
                         <div className="flex flex-col w-full h-fit justify-center items-center">
@@ -160,13 +160,21 @@ const Tickets = ({
                                         }
                                         className="w-40"
                                     />
-                                    <p
+                                    <h3
                                         className={
-                                            "mt-1 max-w-2xl text-lg text-gray-900 " +
+                                            "text-2xl font-medium leading-6 text-black " +
                                             poppins.className
                                         }
                                     >
-                                        No tickets found...
+                                        No Tickets
+                                    </h3>
+                                    <p
+                                        className={
+                                            "mt-1 max-w-2xl text-sm text-gray-800 " +
+                                            lato.className
+                                        }
+                                    >
+                                        You don&apos;t have any tickets yet
                                     </p>
                                 </div>
                             )}
