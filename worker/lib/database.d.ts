@@ -59,21 +59,21 @@ export interface Database {
         Row: {
           bubble: string
           content: string
-          embedding: string
+          embedding: number[]
           entity: string
           id: number
         }
         Insert: {
           bubble: string
           content: string
-          embedding: string
+          embedding: number[]
           entity: string
           id?: number
         }
         Update: {
           bubble?: string
           content?: string
-          embedding?: string
+          embedding?: number[]
           entity?: string
           id?: number
         }
