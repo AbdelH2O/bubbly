@@ -281,7 +281,7 @@
 .chatbox__body__message {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.75rem;
     /* margin-bottom: 1rem; */
     /* max-width: 80%; */
     /* width: ; */
