@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { env } from "~/env.mjs";
 import { useSession } from "next-auth/react";
-import type { Database } from "lib/database.types";
+import type { Database } from "lib/database";
 // import { log } from "console";
 
 const useToken = () => {

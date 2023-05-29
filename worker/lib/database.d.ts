@@ -17,6 +17,7 @@ export interface Database {
           id: string
           name: string
           owner: string | null
+          ticket_email: string | null
         }
         Insert: {
           created_at?: string
@@ -25,6 +26,7 @@ export interface Database {
           id?: string
           name: string
           owner?: string | null
+          ticket_email?: string | null
         }
         Update: {
           created_at?: string
@@ -33,6 +35,24 @@ export interface Database {
           id?: string
           name?: string
           owner?: string | null
+          ticket_email?: string | null
+        }
+      }
+      chat: {
+        Row: {
+          bubble: string
+          created_at: string | null
+          fingerprint: string
+        }
+        Insert: {
+          bubble: string
+          created_at?: string | null
+          fingerprint: string
+        }
+        Update: {
+          bubble?: string
+          created_at?: string | null
+          fingerprint?: string
         }
       }
       embeddings: {
@@ -88,6 +108,52 @@ export interface Database {
           tokens?: number | null
           type?: string
           url?: string | null
+        }
+      }
+      message: {
+        Row: {
+          chat: string
+          content: string
+          created_at: string | null
+          id: number
+          sender: string
+        }
+        Insert: {
+          chat: string
+          content: string
+          created_at?: string | null
+          id?: number
+          sender?: string
+        }
+        Update: {
+          chat?: string
+          content?: string
+          created_at?: string | null
+          id?: number
+          sender?: string
+        }
+      }
+      ticket: {
+        Row: {
+          bubble: string
+          created_at: string | null
+          email: string
+          id: number
+          message: string
+        }
+        Insert: {
+          bubble: string
+          created_at?: string | null
+          email: string
+          id?: number
+          message: string
+        }
+        Update: {
+          bubble?: string
+          created_at?: string | null
+          email?: string
+          id?: number
+          message?: string
         }
       }
       users: {

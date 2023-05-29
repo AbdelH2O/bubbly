@@ -10,6 +10,7 @@ import processQueue from "~/utils/redisClient";
 import aiClient from "~/utils/openAIclient";
 import uSBClient from "~/utils/utilitySupabase";
 import { ChatCompletionRequestMessageRoleEnum } from "openai/dist/api";
+import sendTicketNotification from "~/utils/mailer";
 
 // const CONDENSE_PROMPT = (history: string[], question: string) => {
 //     return `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
@@ -371,6 +372,7 @@ export const resourceRouter = createTRPCRouter({
         bubble_id: z.string(),
         message: z.string(),
         email: z.string().email(),
+        fingerprint: z.string().optional(),
     })).mutation(async ({ input, ctx }) => {
         const bubble = await ctx.prisma.bubble.findUnique({
             where: {
@@ -388,8 +390,16 @@ export const resourceRouter = createTRPCRouter({
                 bubble: bubble.id,
                 message: input.message,
                 email: input.email,
+                chat: input.fingerprint,
             },
         });
+        const t: Ticket = {
+            ...ticket,
+            id: Number(ticket.id),
+            created_at: ticket.created_at ? ticket.created_at.toISOString() : "",
+            chat: ticket.chat ? ticket.chat : "",
+        }
+        await sendTicketNotification(t, bubble.ticket_email ? bubble.ticket_email : "");
         return {
             message: "success",
             data: {

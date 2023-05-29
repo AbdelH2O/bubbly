@@ -217,6 +217,9 @@
 
 .chatbox__header{
     display: flex;
+    align-items: center;
+    justify-content: right;
+    gap: 1rem;
     padding: 14px 12px 14px 12px;
     background: #F0F7FF;
     border-radius: 8px 8px 0 0;
@@ -278,7 +281,7 @@
 .chatbox__body__message {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.3rem;
     /* margin-bottom: 1rem; */
     /* max-width: 80%; */
     /* width: ; */
@@ -379,7 +382,7 @@
 }
 
 #loader {
-    color: #d4d4d8;
+    color: #fff;
 }
 
 .bottom__left {
@@ -449,12 +452,45 @@
 }
 
 .btn__chatbox__close {
-    margin-left: auto;
+    /* margin-left: auto; */
     padding: 12px 17px;
     background: white;
     border-radius: 100%;
     cursor: pointer;
     /* overflow: inherit !important; */
+}
+.raiseTicket {
+    padding: 10px 15px;
+    margin-top: auto;
+    margin-bottom: auto;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration-color: black;
+    color: black;
+}
+
+.raiseTicket:hover {
+    transform: scale(1.05);
+    transition: all 0.1s ease-in-out;
+}
+
+.help {
+    /* text-decoration: none; */
+    margin-left: auto;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.info {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 9.5px;
+    text-align: end;
+    /* color: #979797; */
 }
 
 .powered {
@@ -477,4 +513,156 @@
 
 .powered span:hover {
     filter: brightness(1.2);
+}
+
+.modal {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 9999999999;
+    /* padding-top: 100px; */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* overflow: auto; */
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    font: 400 1rem/1.5rem 'Montserrat', sans-serif;
+    color: #595959;
+}
+
+.modal-content {
+    background-color: #F0F7FF;
+    border-radius: 8px;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media only screen and (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+        height: 40%;
+    }
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    margin-right: 10px;
+    background: white;
+    /* border:  */
+    /* width: 100%; */
+    text-align: end;
+    /* font-size: 28px; */
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 100%;
+    padding: 9px 17px;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    width: 100%;
+    height: 100%;
+}
+
+.content label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    margin-left: 5px;
+}
+
+.content input,
+.content textarea {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    resize: vertical;
+    font: 400 1rem/1.5rem 'Montserrat', sans-serif;
+    color: #595959;
+    margin-bottom: 10px;
+}
+
+.content input:focus,
+.content textarea:focus {
+    outline: none;
+    border: 1px solid #014DFE;
+}
+
+.submitTick {
+    background-color: #014DFE;
+    color: #fff;
+    cursor: pointer;
+    width: 100%;
+    padding: 7px;
+    border: none;
+    border-radius: 8px;
+    font: 400 1rem/1.5rem 'Montserrat', sans-serif;
+    color: #fff;
+    margin-bottom: 10px;
+    
+}
+
+.submitTick:active {
+    background-color: #014DFE;
+    filter: brightness(0.8);
+}
+
+.submitTick:disabled {
+    background-color: #014DFE;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.submitTick:disabled:hover {
+    background-color: #014DFE;
+    filter: brightness(1);
+}
+
+.submitTick:disabled:active {
+    background-color: #014DFE;
+    filter: brightness(0.8);
+}
+
+.submitTick:disabled:focus {
+    background-color: #014DFE;
+    filter: brightness(0.8);
+}
+
+.modal-header {
+    display: flex;
+    /* justify-content: end; */
+    align-items: center;
+    width: 100%;
+    flex-direction: row;
+}
+
+.header {
+    flex-grow: 1;
+}
+
+.loading {
+    display: block;
 }

@@ -1,5 +1,4 @@
 import template from './views/index.html';
-import './views/index.css';
 
 const supportedAPI = ['init'];
 
@@ -12,16 +11,19 @@ let messages = [{
 
 messages.push = function() {
     const len = Array.prototype.push.apply(this, arguments);
-    render();
+    render(shadow);
     return len;
 };
 
 let interval;
 
 let bubble = '';
+let fingerprint = '';
+var shadow = '';
 
 function render() {
-    const chatArea = document.querySelector('#chatbox__body');
+    const chatArea = shadow.querySelector('#chatbox__body');
+    // console.log(document);
     chatArea.innerHTML = '';
     messages.forEach((message) => {
         const el = document.createElement('div');
@@ -64,14 +66,14 @@ function render() {
 }
 
 const scrolltoBottom = function() {
-    const bodyWrapper =  document.querySelector(".chatbox__body__wrapper")
+    const bodyWrapper =  shadow.querySelector(".chatbox__body__wrapper")
     bodyWrapper.scrollTop = bodyWrapper.scrollHeight;
 }
 
 let id = 1;
 
-const url = 'https://bbly.vercel.app/api/trpc/entity.sendMessage?batch=1';
-
+const url = 'https://app.getbubblyai.com/api/trpc/entity.sendMessage?batch=1';
+const ticketUrl = 'https://bubbly-git-staging-bubbly.vercel.app/api/trpc/entity.raiseTicket?batch=1';
 function app(window) {
     let globalObject = window[window['MyWidget']];
     let queue = globalObject.q;
@@ -90,21 +92,25 @@ function app(window) {
 
     const el = document.createElement('div');
     el.innerHTML = template;
-
-    document.body.appendChild(el);
-    render();
-    const button = document.querySelector('#bubble_head');
-    const chatArea = document.querySelector('#chat_area');
-    const overall = document.querySelector('.bbly');
-    const btnChatboxClose = document.querySelector('#btnChatboxClose');
+    const container = document.createElement('div');
+    shadow = container.attachShadow({ mode: 'open' });
+    shadow.appendChild(el);
+    document.body.appendChild(container);
+    // const st = shadow.querySelector('#li');
+    // console.log(st.href);
+    // const style = document.createElement('style');
+    // style.href = st.href;
+    // style.innerHTML = st.innerHTML;
+    // console.log(style);
+    // document.head.appendChild(st);
+    addStyleLink(document, 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700;800&display=swap')
+    
+    render(shadow);
+    const button = shadow.querySelector('#bubble_head');
+    const chatArea = shadow.querySelector('#chat_area');
+    const overall = shadow.querySelector('.bbly');
+    const btnChatboxClose = shadow.querySelector('#btnChatboxClose');
     button.addEventListener('click', () => {
-        // send('Hello, World!');
-        // console.log('Hello, World!');
-        // if(chatArea.style.display === 'block') {
-        //     chatArea.style.display = 'none';
-        // } else {
-        //     chatArea.style.display = 'block';
-        // }
         chatArea.classList.toggle('hide');
         overall.classList.toggle('sm-full');
         
@@ -113,37 +119,100 @@ function app(window) {
       chatArea.classList.toggle("hide");
       overall.classList.toggle("sm-full");
     });
-    document.body.addEventListener('click', (e) => {
+    shadow.addEventListener('click', (e) => {
         // check if the click was inside the chat area and the chat area is not hidden
         if (!chatArea.contains(e.target) && !chatArea.classList.contains('hide') && !button.contains(e.target)) {
             chatArea.classList.toggle('hide');
             overall.classList.toggle('sm-full');
         }
     });
-    const sendMessage = document.querySelector('#send_message');
+    const sendMessage = shadow.querySelector('#send_message');
     sendMessage.addEventListener('click', () => {
-        const text = document.querySelector('#message').value;
+        const text = shadow.querySelector('#message').value;
         send(text);
-        document.querySelector('#message').value = '';
+        shadow.querySelector('#message').value = '';
         scrolltoBottom()
     });
     // listen for enter key press to send message and clear input while the chat area is not hidden
-    document.querySelector('#message').addEventListener('keyup', (e) => {
+    shadow.querySelector('#message').addEventListener('keyup', (e) => {
         
         // change send button icon on text input
         if(e.target.value && e.target.value != ''){
-            document.querySelector('#send_message').disabled = false
+            shadow.querySelector('#send_message').disabled = false
         }else{
-            document.querySelector("#send_message").disabled = true;
+            shadow.querySelector("#send_message").disabled = true;
         }
         if (e.key === 'Enter' && !chatArea.classList.contains('hide')) {
-            const text = document.querySelector('#message').value;
+            const text = shadow.querySelector('#message').value;
             send(text);
-            document.querySelector('#message').value = '';
+            shadow.querySelector('#message').value = '';
             scrolltoBottom()
         }
     });
     // console.log('Hello, World!');
+    const raiseTicketButton = shadow.querySelector('.raiseTicket');
+    const modal = shadow.querySelector('#modal');
+    const modalContent = shadow.querySelector('.modal-content');
+    const closeButton = shadow.querySelector('.close');
+
+    modal.addEventListener('click', (e) => {
+        if (!modalContent.contains(e.target)) {
+            modal.style.display = 'none';
+            console.log('clicked');
+        }
+    });
+
+    raiseTicketButton.addEventListener('click', () => {
+        modal.style.display = 'flex';
+        chatArea.classList.toggle("hide");
+    });
+    
+    closeButton.addEventListener('click', () => {
+        modal.style.display = 'none';
+        chatArea.classList.toggle("hide");
+    });
+
+    const submitButton = shadow.querySelector('#submitTicket');
+    submitButton.addEventListener('click', (e) => {
+        const btn = e.target;
+        btn.disabled = true;
+        btn.innerHTML = 'Submitting...';
+        btn.style.opacity = 0.8;
+        btn.style.cursor = 'not-allowed';
+        const email = shadow.querySelector('#email').value;
+        const message = shadow.querySelector('#msg').value;
+        const data = {
+            bubble_id: bubble,
+            email,
+            message,
+            fingerprint
+        };
+        console.log(data);
+        fetch(ticketUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                0: {
+                    json: data,
+                },
+            }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data);
+                modal.style.display = 'none';
+                chatArea.classList.toggle("hide");
+                btn.disabled = false;
+                btn.innerHTML = 'Submit';
+                btn.style.opacity = 1;
+                btn.style.cursor = 'pointer';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
 }
 
 function send(text) {
@@ -160,8 +229,8 @@ function send(text) {
         timestamp: new Date().toLocaleTimeString(),
     });
     // disable the send button
-    document.querySelector('#send_message').disabled = true;
-    document.querySelector('#send_message').classList.toggle('disabled');
+    shadow.querySelector('#send_message').disabled = true;
+    shadow.querySelector('#send_message').classList.toggle('disabled');
     // simulate waiting for a response
     // setTimeout(() => {
     //     messages.pop();
@@ -192,6 +261,7 @@ function send(text) {
                     bubble_id: bubble,
                     // remove the loading message
                     messages: messages.slice(0, -1),
+                    fingerprint: fingerprint,
                 }
             }
         }),
@@ -206,8 +276,8 @@ function send(text) {
             content: data[0].result.data.json.data.message.content,
             timestamp: new Date().toLocaleTimeString(),
         });
-        document.querySelector('#send_message').disabled = false;
-        document.querySelector('#send_message').classList.toggle('disabled');
+        shadow.querySelector('#send_message').disabled = false;
+        shadow.querySelector('#send_message').classList.toggle('disabled');
         
         // clear the loading animation
         clearInterval(interval);
@@ -235,11 +305,20 @@ function apiHandler(api, params) {
     }
 }
 
-// function extendObject(a, b) {
-//     for (var key in b)
-//         if (b.hasOwnProperty(key))
-//             a[key] = b[key];
-//     return a;
-// }
-
+const fpPromise = import('@fingerprintjs/fingerprintjs')
+    .then(FingerprintJS => FingerprintJS.load());
+fpPromise.then(fp => {
+    fp.get().then(result => {
+        console.log(result.visitorId);
+        fingerprint = result.visitorId;
+    });
+});
 app(window);
+
+function addStyleLink (document, url) {
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'stylesheet');
+    link.setAttribute('type', 'text/css');
+    link.setAttribute('href', url);
+    document.head.appendChild(link);
+}

@@ -3,10 +3,10 @@ import {
   getServerSession,
   type NextAuthOptions,
   type DefaultSession,
-  Theme,
+  type Theme,
 } from "next-auth";
 // import DiscordProvider from "next-auth/providers/discord";
-import EmailProvider, { SendVerificationRequestParams } from "next-auth/providers/email";
+import EmailProvider, { type SendVerificationRequestParams } from "next-auth/providers/email";
 // import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { SupabaseAdapter } from "@next-auth/supabase-adapter";
 import { env } from "~/env.mjs";
@@ -101,6 +101,8 @@ async function sendVerificationRequest(params: SendVerificationRequestParams) {
   const { identifier, url, provider, theme } = params;
   const { host } = new URL(url);
   // NOTE: You are not required to use `nodemailer`, use whatever you want.
+  console.log(provider);
+  
   const transport = createTransport(provider.server)
   const result = await transport.sendMail({
     to: identifier,

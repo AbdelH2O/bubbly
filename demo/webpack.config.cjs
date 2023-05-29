@@ -1,8 +1,9 @@
 const path = require('path');
 const webpack = require('webpack');
 var copyWebpackPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const bundleOutputDir = './dist';
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = (env) => {
     const isDevBuild = !(env && env.prod);
@@ -20,7 +21,14 @@ module.exports = (env) => {
             ? [new webpack.SourceMapDevToolPlugin(), new copyWebpackPlugin({ patterns: ['dummy/'] })]
             : [],
         optimization: {
-            minimizer: [new UglifyJsPlugin()],
+            minimize: true,
+            minimizer: [new TerserPlugin({
+                terserOptions: {
+                    compress: {
+                        drop_console: true,
+                    },
+                },
+            })],
         },
         mode: isDevBuild ? 'development' : 'production',
         module: {

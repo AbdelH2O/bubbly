@@ -21,6 +21,9 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { MDXRemote } from 'next-mdx-remote';
 import Head from "next/head";
+import Settings from "~/components/Settings";
+import Tickets from "~/components/Tickets";
+import Chats from "~/components/Chats";
 // import Heading from '../components/heading';
 
 // const components = { Heading };
@@ -31,37 +34,7 @@ const poppins = Poppins({
 });
 const lato = Lato({ subsets: ["latin"], weight: ["400", "700", "900"] });
 
-type Bubble = {
-    id: string;
-    name: string;
-    description: string;
-    created_at: string;
-    greet_message: string;
-    info_entity:
-        | {
-              id: string;
-              type: string;
-              data: string;
-              url: string | null;
-              created_at: string;
-              tokens: number | null;
-              // 0: not processed, 1: getting processed, 2: processed
-              processed: number;
-          }[]
-        | null;
-};
-
-type InfoEntity = {
-    id?: string;
-    type: string;
-    data: string;
-    url?: string;
-    created_at?: string;
-    // 0: not processed, 1: getting processed, 2: processed
-    processed: number;
-};
-
-const headers = ["Info", "URLs/texts", "Integration", "Try now!", "Settings"];
+const headers = ["Info", "URLs/texts", "Integration", "Try now!", "Tickets", "Chats", "Settings"];
 
 const BubblePage = () => {
     const router = useRouter();
@@ -76,6 +49,7 @@ const BubblePage = () => {
         greet_message: "",
         created_at: "",
         info_entity: null,
+        ticket_email: "",
     });
     const [process, setProcess] = useState<{
         id: string;
@@ -919,6 +893,9 @@ const BubblePage = () => {
                             <div className="flex flex-col w-full bg-red-50">
                                 <Try name={bubble?.name} bubble={bubble?.id} greet={bubble.greet_message} />
                             </div>
+                            <Tickets bubble_id={bubble.id} supabase={supabase} />
+                            <Chats bubble_id={bubble.id} supabase={supabase}/>
+                            <Settings bubble={bubble} setBubble={setBubble} supabase={supabase} />
                         </Navigation>
                     </div>
                 </main>
